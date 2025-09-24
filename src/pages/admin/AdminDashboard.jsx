@@ -112,32 +112,36 @@ export default function AdminDashboard() {
   const salesUsers = users.filter((user) => user.role === "sales")
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       <div className="space-y-2">
-        <h1 className="text-4xl font-bold tracking-tight">Sales Dashboard</h1>
-        <p className="text-xl text-muted-foreground">Monitor your team's performance and track daily activities</p>
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight">Sales Dashboard</h1>
+        <p className="text-base sm:text-lg lg:text-xl text-muted-foreground">
+          Monitor your team's performance and track daily activities
+        </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         <Card className="metric-card border-l-4 border-l-primary">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
             <CardTitle className="text-sm font-medium text-muted-foreground">Today's Visits</CardTitle>
-            <Target className="h-5 w-5 text-primary" />
+            <Target className="h-5 w-5 text-primary flex-shrink-0" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{metrics.today.total}</div>
-            <p className="text-sm text-muted-foreground mt-1">{metrics.today.completionRate}% completion rate</p>
+            <div className="text-2xl sm:text-3xl font-bold">{metrics.today.total}</div>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-1">
+              {metrics.today.completionRate}% completion rate
+            </p>
           </CardContent>
         </Card>
 
         <Card className="metric-card border-l-4 border-l-success">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
             <CardTitle className="text-sm font-medium text-muted-foreground">Completed</CardTitle>
-            <CheckCircle className="h-5 w-5 text-success" />
+            <CheckCircle className="h-5 w-5 text-success flex-shrink-0" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-success">{metrics.today.completed}</div>
-            <p className="text-sm text-muted-foreground mt-1">
+            <div className="text-2xl sm:text-3xl font-bold text-success">{metrics.today.completed}</div>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-1">
               {metrics.today.total - metrics.today.completed} remaining
             </p>
           </CardContent>
@@ -146,22 +150,22 @@ export default function AdminDashboard() {
         <Card className="metric-card border-l-4 border-l-warning">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
             <CardTitle className="text-sm font-medium text-muted-foreground">In Progress</CardTitle>
-            <Activity className="h-5 w-5 text-warning" />
+            <Activity className="h-5 w-5 text-warning flex-shrink-0" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-warning">{metrics.today.inProgress}</div>
-            <p className="text-sm text-muted-foreground mt-1">Currently active</p>
+            <div className="text-2xl sm:text-3xl font-bold text-warning">{metrics.today.inProgress}</div>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-1">Currently active</p>
           </CardContent>
         </Card>
 
         <Card className="metric-card border-l-4 border-l-info">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
             <CardTitle className="text-sm font-medium text-muted-foreground">Weekly Progress</CardTitle>
-            <TrendingUp className="h-5 w-5 text-info" />
+            <TrendingUp className="h-5 w-5 text-info flex-shrink-0" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-info">{metrics.week.completionRate}%</div>
-            <p className="text-sm text-muted-foreground mt-1">
+            <div className="text-2xl sm:text-3xl font-bold text-info">{metrics.week.completionRate}%</div>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-1">
               {metrics.week.completed} of {metrics.week.total} completed
             </p>
           </CardContent>
@@ -170,13 +174,13 @@ export default function AdminDashboard() {
 
       <Card className="glass-effect">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Filter className="h-5 w-5" />
+          <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+            <Filter className="h-5 w-5 flex-shrink-0" />
             Filters & Search
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
             <div className="space-y-2">
               <label className="text-sm font-medium">Time Period</label>
               <Select value={dateFilter} onChange={(e) => setDateFilter(e.target.value)}>
@@ -210,10 +214,10 @@ export default function AdminDashboard() {
               </Select>
             </div>
 
-            <div className="space-y-2 md:col-span-2">
+            <div className="space-y-2 sm:col-span-2 lg:col-span-1 xl:col-span-2">
               <label className="text-sm font-medium">Search</label>
               <div className="relative">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground flex-shrink-0" />
                 <Input
                   placeholder="Search by company, salesperson, or city..."
                   value={searchTerm}
@@ -228,17 +232,20 @@ export default function AdminDashboard() {
 
       <Card className="data-table">
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5" />
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                <Calendar className="h-5 w-5 flex-shrink-0" />
                 Visit Management
               </CardTitle>
               <CardDescription>
                 {filteredTasks.length} visit{filteredTasks.length !== 1 ? "s" : ""} found
               </CardDescription>
             </div>
-            <Button onClick={() => navigate("/admin/assign-task")} className="bg-primary hover:bg-primary/90">
+            <Button
+              onClick={() => navigate("/admin/assign-task")}
+              className="bg-primary hover:bg-primary/90 w-full sm:w-auto"
+            >
               Assign New Task
             </Button>
           </div>
@@ -256,123 +263,127 @@ export default function AdminDashboard() {
             </div>
           ) : (
             <div className="rounded-lg border border-border/50 overflow-hidden">
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-muted/30">
-                    <TableHead className="font-semibold">Date & Time</TableHead>
-                    <TableHead className="font-semibold">Salesperson</TableHead>
-                    <TableHead className="font-semibold">Company</TableHead>
-                    <TableHead className="font-semibold">Status</TableHead>
-                    <TableHead className="font-semibold">Check-in</TableHead>
-                    <TableHead className="font-semibold">Check-out</TableHead>
-                    <TableHead className="font-semibold">GPS</TableHead>
-                    <TableHead className="font-semibold">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredTasks.map((task) => (
-                    <TableRow key={task.id} className="hover:bg-muted/20 transition-colors">
-                      <TableCell>
-                        <div className="space-y-1">
-                          <div className="font-medium">{formatDate(task.dueAt)}</div>
-                          <div className="text-sm text-muted-foreground">{formatTime(task.dueAt)}</div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="space-y-1">
-                          <div className="font-medium">{task.salesperson?.name}</div>
-                          <div className="text-sm text-muted-foreground">{task.salesperson?.phone}</div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="space-y-1">
-                          <div className="font-medium">{task.company?.name}</div>
-                          <div className="text-sm text-muted-foreground">
-                            {task.company?.address.city}, {task.company?.address.state}
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={getStatusVariant(task.status)} className="font-medium">
-                          {getStatusLabel(task.status)}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        {task.report?.checkIn ? (
-                          <div className="space-y-1">
-                            <div className="text-sm font-medium text-success">{formatTime(task.report.checkIn.at)}</div>
-                            {task.report.checkIn.gps && (
-                              <div className="text-xs text-muted-foreground flex items-center gap-1">
-                                <MapPin className="h-3 w-3" />
-                                GPS Verified
-                              </div>
-                            )}
-                          </div>
-                        ) : (
-                          <span className="text-muted-foreground">-</span>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        {task.report?.checkOut ? (
-                          <div className="space-y-1">
-                            <div className="text-sm font-medium text-success">
-                              {formatTime(task.report.checkOut.at)}
-                            </div>
-                            {task.report.checkOut.gps && (
-                              <div className="text-xs text-muted-foreground flex items-center gap-1">
-                                <MapPin className="h-3 w-3" />
-                                GPS Verified
-                              </div>
-                            )}
-                          </div>
-                        ) : (
-                          <span className="text-muted-foreground">-</span>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        {task.report?.checkIn?.gps ? (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                              const { lat, lng } = task.report.checkIn.gps
-                              window.open(`https://maps.google.com/?q=${lat},${lng}`, "_blank")
-                            }}
-                          >
-                            <MapPin className="h-4 w-4 text-success" />
-                          </Button>
-                        ) : (
-                          <span className="text-muted-foreground">-</span>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex gap-2">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => navigate(`/admin/companies/${task.companyId}`)}
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-muted/30">
+                      <TableHead className="font-semibold min-w-[120px]">Date & Time</TableHead>
+                      <TableHead className="font-semibold min-w-[150px]">Salesperson</TableHead>
+                      <TableHead className="font-semibold min-w-[150px]">Company</TableHead>
+                      <TableHead className="font-semibold min-w-[100px]">Status</TableHead>
+                      <TableHead className="font-semibold min-w-[100px]">Check-in</TableHead>
+                      <TableHead className="font-semibold min-w-[100px]">Check-out</TableHead>
+                      <TableHead className="font-semibold min-w-[80px]">GPS</TableHead>
+                      <TableHead className="font-semibold min-w-[100px]">Actions</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredTasks.map((task) => (
+                      <TableRow key={task.id} className="hover:bg-muted/20 transition-colors">
+                        <TableCell>
+                          <div className="space-y-1">
+                            <div className="font-medium text-sm">{formatDate(task.dueAt)}</div>
+                            <div className="text-xs text-muted-foreground">{formatTime(task.dueAt)}</div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="space-y-1">
+                            <div className="font-medium text-sm">{task.salesperson?.name}</div>
+                            <div className="text-xs text-muted-foreground">{task.salesperson?.phone}</div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="space-y-1">
+                            <div className="font-medium text-sm">{task.company?.name}</div>
+                            <div className="text-xs text-muted-foreground">
+                              {task.company?.address.city}, {task.company?.address.state}
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={getStatusVariant(task.status)} className="font-medium text-xs">
+                            {getStatusLabel(task.status)}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          {task.report?.checkIn ? (
+                            <div className="space-y-1">
+                              <div className="text-xs font-medium text-success">
+                                {formatTime(task.report.checkIn.at)}
+                              </div>
+                              {task.report.checkIn.gps && (
+                                <div className="text-xs text-muted-foreground flex items-center gap-1">
+                                  <MapPin className="h-3 w-3 flex-shrink-0" />
+                                  GPS Verified
+                                </div>
+                              )}
+                            </div>
+                          ) : (
+                            <span className="text-muted-foreground">-</span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {task.report?.checkOut ? (
+                            <div className="space-y-1">
+                              <div className="text-xs font-medium text-success">
+                                {formatTime(task.report.checkOut.at)}
+                              </div>
+                              {task.report.checkOut.gps && (
+                                <div className="text-xs text-muted-foreground flex items-center gap-1">
+                                  <MapPin className="h-3 w-3 flex-shrink-0" />
+                                  GPS Verified
+                                </div>
+                              )}
+                            </div>
+                          ) : (
+                            <span className="text-muted-foreground">-</span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {task.report?.checkIn?.gps ? (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                const { lat, lng } = task.report.checkIn.gps
+                                window.open(`https://maps.google.com/?q=${lat},${lng}`, "_blank")
+                              }}
+                            >
+                              <MapPin className="h-4 w-4 text-success" />
+                            </Button>
+                          ) : (
+                            <span className="text-muted-foreground">-</span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex gap-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => navigate(`/admin/companies/${task.companyId}`)}
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
             </div>
           )}
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         <Card
           className="metric-card cursor-pointer hover:scale-105 transition-transform"
           onClick={() => navigate("/admin/assign-task")}
         >
           <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <ClipboardList className="h-5 w-5 text-primary" />
+            <CardTitle className="text-base sm:text-lg flex items-center gap-2">
+              <ClipboardList className="h-5 w-5 text-primary flex-shrink-0" />
               Assign New Task
             </CardTitle>
             <CardDescription>Create and assign a new visit task to your sales team</CardDescription>
@@ -384,8 +395,8 @@ export default function AdminDashboard() {
           onClick={() => navigate("/admin/tasks")}
         >
           <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Activity className="h-5 w-5 text-info" />
+            <CardTitle className="text-base sm:text-lg flex items-center gap-2">
+              <Activity className="h-5 w-5 text-info flex-shrink-0" />
               View All Tasks
             </CardTitle>
             <CardDescription>Browse and filter all tasks across different time periods</CardDescription>
@@ -397,8 +408,8 @@ export default function AdminDashboard() {
           onClick={() => navigate("/admin/companies")}
         >
           <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Users className="h-5 w-5 text-success" />
+            <CardTitle className="text-base sm:text-lg flex items-center gap-2">
+              <Users className="h-5 w-5 text-success flex-shrink-0" />
               Manage Companies
             </CardTitle>
             <CardDescription>Add new companies or update existing company information</CardDescription>

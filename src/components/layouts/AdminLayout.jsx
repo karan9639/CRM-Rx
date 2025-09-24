@@ -13,7 +13,7 @@ export default function AdminLayout() {
       <TopBar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
       <div className="flex">
         <Sidebar role="admin" sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-        <main className="flex-1 p-4 md:p-6 lg:ml-0 transition-all duration-300 min-h-[calc(100vh-4rem)]">
+        <main className="flex-1 p-3 sm:p-4 md:p-6 lg:ml-0 transition-all duration-300 min-h-[calc(100vh-4rem)] w-full overflow-x-hidden">
           <Outlet />
         </main>
       </div>

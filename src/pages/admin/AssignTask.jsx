@@ -148,34 +148,43 @@ export default function AssignTask() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-foreground">{isEditing ? "Edit Task" : "Assign New Task"}</h1>
-        <p className="text-muted-foreground">
+      <div className="space-y-2">
+        <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
+          {isEditing ? "Edit Task" : "Assign New Task"}
+        </h1>
+        <p className="text-sm sm:text-base text-muted-foreground">
           {isEditing ? "Update the task details" : "Create and assign a visit task to your sales team"}
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           {/* Task Details */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center">
-                {isEditing ? <Edit className="mr-2 h-5 w-5" /> : <UserPlus className="mr-2 h-5 w-5" />}
+              <CardTitle className="flex items-center text-base sm:text-lg">
+                {isEditing ? (
+                  <Edit className="mr-2 h-5 w-5 flex-shrink-0" />
+                ) : (
+                  <UserPlus className="mr-2 h-5 w-5 flex-shrink-0" />
+                )}
                 Task Assignment
               </CardTitle>
               <CardDescription>Select salesperson and schedule the visit</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="salesperson">Salesperson *</Label>
+                <Label htmlFor="salesperson" className="text-sm font-medium">
+                  Salesperson *
+                </Label>
                 <Select
                   id="salesperson"
                   value={formData.salespersonId}
                   onChange={(e) => handleInputChange("salespersonId", e.target.value)}
                   required
+                  className="w-full"
                 >
                   <option value="">Select a salesperson</option>
                   {salesUsers.map((user) => (
@@ -186,44 +195,55 @@ export default function AssignTask() {
                 </Select>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="dueDate">Visit Date *</Label>
+                  <Label htmlFor="dueDate" className="text-sm font-medium">
+                    Visit Date *
+                  </Label>
                   <Input
                     id="dueDate"
                     type="date"
                     value={formData.dueDate}
                     onChange={(e) => handleInputChange("dueDate", e.target.value)}
                     required
+                    className="w-full"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="dueTime">Visit Time *</Label>
+                  <Label htmlFor="dueTime" className="text-sm font-medium">
+                    Visit Time *
+                  </Label>
                   <Input
                     id="dueTime"
                     type="time"
                     value={formData.dueTime}
                     onChange={(e) => handleInputChange("dueTime", e.target.value)}
                     required
+                    className="w-full"
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="through">Through (Optional)</Label>
+                <Label htmlFor="through" className="text-sm font-medium">
+                  Through (Optional)
+                </Label>
                 <Input
                   id="through"
                   placeholder="e.g., LinkedIn connection, referral"
                   value={formData.through}
                   onChange={(e) => handleInputChange("through", e.target.value)}
+                  className="w-full"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="notes">Notes (Optional)</Label>
+                <Label htmlFor="notes" className="text-sm font-medium">
+                  Notes (Optional)
+                </Label>
                 <textarea
                   id="notes"
-                  className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-y"
                   placeholder="Additional instructions or context for the visit"
                   value={formData.notes}
                   onChange={(e) => handleInputChange("notes", e.target.value)}
@@ -235,18 +255,19 @@ export default function AssignTask() {
           {/* Company Selection */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center">
-                <Building2 className="mr-2 h-5 w-5" />
+              <CardTitle className="flex items-center text-base sm:text-lg">
+                <Building2 className="mr-2 h-5 w-5 flex-shrink-0" />
                 Company Details
               </CardTitle>
               <CardDescription>Select existing company or add a new one</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex items-center space-x-4">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
                 <Button
                   type="button"
                   variant={!showNewCompany ? "default" : "outline"}
                   onClick={() => setShowNewCompany(false)}
+                  className="w-full sm:w-auto"
                 >
                   Existing Company
                 </Button>
@@ -254,6 +275,7 @@ export default function AssignTask() {
                   type="button"
                   variant={showNewCompany ? "default" : "outline"}
                   onClick={() => setShowNewCompany(true)}
+                  className="w-full sm:w-auto"
                 >
                   + Add New Company
                 </Button>
@@ -261,12 +283,15 @@ export default function AssignTask() {
 
               {!showNewCompany ? (
                 <div className="space-y-2">
-                  <Label htmlFor="company">Select Company *</Label>
+                  <Label htmlFor="company" className="text-sm font-medium">
+                    Select Company *
+                  </Label>
                   <Select
                     id="company"
                     value={formData.companyId}
                     onChange={(e) => handleInputChange("companyId", e.target.value)}
                     required={!showNewCompany}
+                    className="w-full"
                   >
                     <option value="">Select a company</option>
                     {companies.map((company) => (
@@ -279,55 +304,70 @@ export default function AssignTask() {
               ) : (
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="newCompanyName">Company Name *</Label>
+                    <Label htmlFor="newCompanyName" className="text-sm font-medium">
+                      Company Name *
+                    </Label>
                     <Input
                       id="newCompanyName"
                       placeholder="Enter company name"
                       value={formData.newCompanyName}
                       onChange={(e) => handleInputChange("newCompanyName", e.target.value)}
                       required={showNewCompany}
+                      className="w-full"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="newCompanyAddress">Address *</Label>
+                    <Label htmlFor="newCompanyAddress" className="text-sm font-medium">
+                      Address *
+                    </Label>
                     <Input
                       id="newCompanyAddress"
                       placeholder="Street address"
                       value={formData.newCompanyAddress}
                       onChange={(e) => handleInputChange("newCompanyAddress", e.target.value)}
                       required={showNewCompany}
+                      className="w-full"
                     />
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="newCompanyCity">City *</Label>
+                      <Label htmlFor="newCompanyCity" className="text-sm font-medium">
+                        City *
+                      </Label>
                       <Input
                         id="newCompanyCity"
                         placeholder="City"
                         value={formData.newCompanyCity}
                         onChange={(e) => handleInputChange("newCompanyCity", e.target.value)}
                         required={showNewCompany}
+                        className="w-full"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="newCompanyState">State *</Label>
+                      <Label htmlFor="newCompanyState" className="text-sm font-medium">
+                        State *
+                      </Label>
                       <Input
                         id="newCompanyState"
                         placeholder="State"
                         value={formData.newCompanyState}
                         onChange={(e) => handleInputChange("newCompanyState", e.target.value)}
                         required={showNewCompany}
+                        className="w-full"
                       />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="newCompanyPincode">Pincode *</Label>
+                    <Label htmlFor="newCompanyPincode" className="text-sm font-medium">
+                      Pincode *
+                    </Label>
                     <Input
                       id="newCompanyPincode"
                       placeholder="Pincode"
                       value={formData.newCompanyPincode}
                       onChange={(e) => handleInputChange("newCompanyPincode", e.target.value)}
                       required={showNewCompany}
+                      className="w-full"
                     />
                   </div>
                 </div>
@@ -339,8 +379,8 @@ export default function AssignTask() {
         {/* Contact Information */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center">
-              <User className="mr-2 h-5 w-5" />
+            <CardTitle className="flex items-center text-base sm:text-lg">
+              <User className="mr-2 h-5 w-5 flex-shrink-0" />
               Contact Information (Optional)
             </CardTitle>
             <CardDescription>Provide contact details if known</CardDescription>
@@ -348,40 +388,52 @@ export default function AssignTask() {
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="contactName">Contact Name</Label>
+                <Label htmlFor="contactName" className="text-sm font-medium">
+                  Contact Name
+                </Label>
                 <Input
                   id="contactName"
                   placeholder="Full name"
                   value={formData.contactName}
                   onChange={(e) => handleInputChange("contactName", e.target.value)}
+                  className="w-full"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="contactRole">Designation</Label>
+                <Label htmlFor="contactRole" className="text-sm font-medium">
+                  Designation
+                </Label>
                 <Input
                   id="contactRole"
                   placeholder="e.g., CEO, Manager"
                   value={formData.contactRole}
                   onChange={(e) => handleInputChange("contactRole", e.target.value)}
+                  className="w-full"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="contactPhone">Phone</Label>
+                <Label htmlFor="contactPhone" className="text-sm font-medium">
+                  Phone
+                </Label>
                 <Input
                   id="contactPhone"
                   placeholder="+91-XXXXXXXXXX"
                   value={formData.contactPhone}
                   onChange={(e) => handleInputChange("contactPhone", e.target.value)}
+                  className="w-full"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="contactEmail">Email</Label>
+                <Label htmlFor="contactEmail" className="text-sm font-medium">
+                  Email
+                </Label>
                 <Input
                   id="contactEmail"
                   type="email"
                   placeholder="email@company.com"
                   value={formData.contactEmail}
                   onChange={(e) => handleInputChange("contactEmail", e.target.value)}
+                  className="w-full"
                 />
               </div>
             </div>
@@ -389,11 +441,11 @@ export default function AssignTask() {
         </Card>
 
         {/* Submit Button */}
-        <div className="flex justify-end space-x-4">
-          <Button type="button" variant="outline" onClick={() => navigate("/admin")}>
+        <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-4">
+          <Button type="button" variant="outline" onClick={() => navigate("/admin")} className="w-full sm:w-auto">
             Cancel
           </Button>
-          <Button type="submit" disabled={isSubmitting} className="bg-primary hover:bg-primary/90">
+          <Button type="submit" disabled={isSubmitting} className="bg-primary hover:bg-primary/90 w-full sm:w-auto">
             {isSubmitting ? (isEditing ? "Updating..." : "Assigning...") : isEditing ? "Update Task" : "Assign Task"}
           </Button>
         </div>

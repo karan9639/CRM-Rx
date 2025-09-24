@@ -19,7 +19,7 @@
     --muted-foreground: 0 0% 65%;
     --accent: 0 0% 14%;
     --accent-foreground: 0 0% 95%;
-    --destructive: 0 72% 51%;
+    --destructive: 0 0% 72%;
     --destructive-foreground: 0 0% 98%;
     --border: 0 0% 20%;
     --input: 0 0% 14%;
@@ -198,5 +198,192 @@
   /* Text improvements */
   .text-gradient {
     @apply bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent;
+  }
+}
+
+/* Enhanced focus states for better accessibility */
+.focus-enhanced:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px hsl(var(--background)), 0 0 0 4px hsl(var(--ring));
+}
+
+/* Better mobile navigation */
+@media (max-width: 1024px) {
+  .mobile-nav-overlay {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .mobile-nav-slide {
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .mobile-nav-slide.open {
+    transform: translateX(0);
+  }
+}
+
+/* Improved mobile typography */
+@media (max-width: 640px) {
+  h1 {
+    font-size: 1.875rem;
+    line-height: 2.25rem;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    line-height: 2rem;
+  }
+
+  h3 {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+  }
+
+  /* Better mobile text wrapping */
+  .mobile-text-wrap {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
+}
+
+/* Enhanced mobile interactions */
+@media (hover: none) and (pointer: coarse) {
+  /* Remove hover effects on touch devices */
+  .hover-only:hover {
+    background-color: inherit;
+    color: inherit;
+  }
+
+  /* Better touch feedback */
+  .touch-feedback:active {
+    transform: scale(0.98);
+    transition: transform 0.1s ease-in-out;
+  }
+}
+
+/* Mobile-optimized animations */
+@media (prefers-reduced-motion: no-preference) {
+  .mobile-slide-up {
+    animation: slideUp 0.3s ease-out;
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+/* Better mobile safe areas */
+@supports (padding: max(0px)) {
+  .safe-area-inset-top {
+    padding-top: max(1rem, env(safe-area-inset-top));
+  }
+
+  .safe-area-inset-bottom {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+
+  .safe-area-inset-left {
+    padding-left: max(1rem, env(safe-area-inset-left));
+  }
+
+  .safe-area-inset-right {
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+}
+
+/* Mobile-first grid improvements */
+.mobile-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .mobile-grid.sm-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 768px) {
+  .mobile-grid.md-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .mobile-grid.lg-4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Enhanced mobile scrolling */
+.mobile-scroll {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* Better mobile modals */
+@media (max-width: 640px) {
+  .mobile-modal {
+    margin: 0;
+    width: 100vw;
+    height: 100vh;
+    max-width: none;
+    max-height: none;
+    border-radius: 0;
+  }
+
+  .mobile-modal-content {
+    height: 100%;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Adding mobile-first responsive utilities and improvements */
+@media (max-width: 640px) {
+  /* Improve touch targets on mobile */
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Better spacing for mobile forms */
+  .mobile-form-spacing > * + * {
+    margin-top: 1rem;
+  }
+
+  /* Improved mobile table scrolling */
+  .mobile-table-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Better mobile card layouts */
+  .mobile-card-stack > * + * {
+    margin-top: 0.75rem;
+  }
+
+  /* Improved mobile button groups */
+  .mobile-button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .mobile-button-group > button {
+    width: 100%;
   }
 }

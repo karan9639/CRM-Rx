@@ -1,24 +1,11 @@
-"use client";
+"use client"
 
-import { useState, useMemo } from "react";
-import {
-  ChevronDown,
-  ChevronUp,
-  Search,
-  Download,
-  Filter,
-  X,
-} from "lucide-react";
-import { Button } from "./button";
-import { Input } from "./input";
-import {
-  SelectRoot,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "./select";
-import { Badge } from "./badge";
+import { useState, useMemo } from "react"
+import { ChevronDown, ChevronUp, Search, Download, Filter, X } from "lucide-react"
+import { Button } from "./button"
+import { Input } from "./input"
+import { SelectRoot, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./select"
+import { Badge } from "./badge"
 
 export function DataTable({
   data = [],
@@ -30,127 +17,119 @@ export function DataTable({
   pageSize = 10,
   className = "",
 }) {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
-  const [currentPage, setCurrentPage] = useState(1);
-  const [filters, setFilters] = useState({});
-  const [showFilters, setShowFilters] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("")
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" })
+  const [currentPage, setCurrentPage] = useState(1)
+  const [filters, setFilters] = useState({})
+  const [showFilters, setShowFilters] = useState(false)
 
   // Get unique values for filterable columns
   const getUniqueValues = (key) => {
-    const values = data.map((item) => item[key]).filter(Boolean);
-    return [...new Set(values)];
-  };
+    const values = data.map((item) => item[key]).filter(Boolean)
+    return [...new Set(values)]
+  }
 
   // Apply search, filter, and sort
   const processedData = useMemo(() => {
-    let filtered = [...data];
+    let filtered = [...data]
 
     // Apply search
     if (searchTerm) {
       filtered = filtered.filter((item) =>
         columns.some((col) => {
-          const value = item[col.key];
-          return (
-            value &&
-            value.toString().toLowerCase().includes(searchTerm.toLowerCase())
-          );
-        })
-      );
+          const value = item[col.key]
+          return value && value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+        }),
+      )
     }
 
     // Apply filters
     Object.entries(filters).forEach(([key, value]) => {
       if (value && value !== "all") {
-        filtered = filtered.filter((item) => item[key] === value);
+        filtered = filtered.filter((item) => item[key] === value)
       }
-    });
+    })
 
     // Apply sort
     if (sortConfig.key) {
       filtered.sort((a, b) => {
-        const aVal = a[sortConfig.key];
-        const bVal = b[sortConfig.key];
+        const aVal = a[sortConfig.key]
+        const bVal = b[sortConfig.key]
 
-        if (aVal < bVal) return sortConfig.direction === "asc" ? -1 : 1;
-        if (aVal > bVal) return sortConfig.direction === "asc" ? 1 : -1;
-        return 0;
-      });
+        if (aVal < bVal) return sortConfig.direction === "asc" ? -1 : 1
+        if (aVal > bVal) return sortConfig.direction === "asc" ? 1 : -1
+        return 0
+      })
     }
 
-    return filtered;
-  }, [data, searchTerm, filters, sortConfig, columns]);
+    return filtered
+  }, [data, searchTerm, filters, sortConfig, columns])
 
   // Pagination
-  const totalPages = Math.ceil(processedData.length / pageSize);
-  const paginatedData = processedData.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize
-  );
+  const totalPages = Math.ceil(processedData.length / pageSize)
+  const paginatedData = processedData.slice((currentPage - 1) * pageSize, currentPage * pageSize)
 
   const handleSort = (key) => {
-    if (!sortable) return;
+    if (!sortable) return
 
     setSortConfig((prev) => ({
       key,
       direction: prev.key === key && prev.direction === "asc" ? "desc" : "asc",
-    }));
-  };
+    }))
+  }
 
   const handleFilterChange = (key, value) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
-    setCurrentPage(1);
-  };
+    setFilters((prev) => ({ ...prev, [key]: value }))
+    setCurrentPage(1)
+  }
 
   const clearFilters = () => {
-    setFilters({});
-    setSearchTerm("");
-    setCurrentPage(1);
-  };
+    setFilters({})
+    setSearchTerm("")
+    setCurrentPage(1)
+  }
 
   const exportToCSV = () => {
-    const headers = columns.map((col) => col.header).join(",");
+    const headers = columns.map((col) => col.header).join(",")
     const rows = processedData.map((item) =>
       columns
         .map((col) => {
-          const value = item[col.key];
-          return typeof value === "string" && value.includes(",")
-            ? `"${value}"`
-            : value;
+          const value = item[col.key]
+          return typeof value === "string" && value.includes(",") ? `"${value}"` : value
         })
-        .join(",")
-    );
+        .join(","),
+    )
 
-    const csv = [headers, ...rows].join("\n");
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "data-export.csv";
-    a.click();
-    window.URL.revokeObjectURL(url);
-  };
+    const csv = [headers, ...rows].join("\n")
+    const blob = new Blob([csv], { type: "text/csv" })
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = "data-export.csv"
+    a.click()
+    window.URL.revokeObjectURL(url)
+  }
 
   const renderCell = (item, column) => {
     if (column.render) {
-      return column.render(item[column.key], item);
+      return column.render(item[column.key], item)
     }
-    return item[column.key];
-  };
+    return item[column.key]
+  }
 
   return (
     <div className={`space-y-4 ${className}`}>
       {/* Controls */}
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        <div className="flex flex-col sm:flex-row gap-2 flex-1">
+        <div className="flex flex-col sm:flex-row gap-2 flex-1 w-full sm:w-auto">
           {searchable && (
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <div className="relative w-full sm:w-64">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4 flex-shrink-0" />
               <Input
                 placeholder="Search..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 w-full sm:w-64"
+                className="pl-10"
               />
             </div>
           )}
@@ -159,34 +138,30 @@ export function DataTable({
             <Button
               variant="outline"
               onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 w-full sm:w-auto justify-center"
             >
-              <Filter className="h-4 w-4" />
+              <Filter className="h-4 w-4 flex-shrink-0" />
               Filters
               {Object.values(filters).some((v) => v && v !== "all") && (
                 <Badge variant="secondary" className="ml-1">
-                  {
-                    Object.values(filters).filter((v) => v && v !== "all")
-                      .length
-                  }
+                  {Object.values(filters).filter((v) => v && v !== "all").length}
                 </Badge>
               )}
             </Button>
           )}
         </div>
 
-        <div className="flex gap-2">
-          {(searchTerm ||
-            Object.values(filters).some((v) => v && v !== "all")) && (
-            <Button variant="outline" onClick={clearFilters} size="sm">
-              <X className="h-4 w-4 mr-1" />
+        <div className="flex gap-2 w-full sm:w-auto">
+          {(searchTerm || Object.values(filters).some((v) => v && v !== "all")) && (
+            <Button variant="outline" onClick={clearFilters} size="sm" className="flex-1 sm:flex-none bg-transparent">
+              <X className="h-4 w-4 mr-1 flex-shrink-0" />
               Clear
             </Button>
           )}
 
           {exportable && (
-            <Button variant="outline" onClick={exportToCSV} size="sm">
-              <Download className="h-4 w-4 mr-1" />
+            <Button variant="outline" onClick={exportToCSV} size="sm" className="flex-1 sm:flex-none bg-transparent">
+              <Download className="h-4 w-4 mr-1 flex-shrink-0" />
               Export
             </Button>
           )}
@@ -200,14 +175,10 @@ export function DataTable({
             .filter((col) => col.filterable)
             .map((column) => (
               <div key={column.key}>
-                <label className="block text-sm font-medium mb-1">
-                  {column.header}
-                </label>
+                <label className="block text-sm font-medium mb-1">{column.header}</label>
                 <SelectRoot
                   value={filters[column.key] || "all"}
-                  onValueChange={(value) =>
-                    handleFilterChange(column.key, value)
-                  }
+                  onValueChange={(value) => handleFilterChange(column.key, value)}
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -226,8 +197,35 @@ export function DataTable({
         </div>
       )}
 
-      {/* Table */}
-      <div className="rounded-lg border bg-white dark:bg-gray-900 overflow-hidden">
+      {/* Mobile Card View for small screens */}
+      <div className="block sm:hidden">
+        {paginatedData.length > 0 ? (
+          <div className="space-y-4">
+            {paginatedData.map((item, index) => (
+              <div
+                key={index}
+                className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4 space-y-3"
+              >
+                {columns.map((column) => (
+                  <div key={column.key} className="flex justify-between items-start">
+                    <span className="text-sm font-medium text-gray-600 dark:text-gray-400 min-w-0 flex-1 pr-2">
+                      {column.header}:
+                    </span>
+                    <div className="text-sm text-gray-900 dark:text-gray-100 text-right min-w-0 flex-1">
+                      {renderCell(item, column)}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-8 text-gray-500 dark:text-gray-400">No data found</div>
+        )}
+      </div>
+
+      {/* Desktop Table View */}
+      <div className="hidden sm:block rounded-lg border bg-white dark:bg-gray-900 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50 dark:bg-gray-800">
@@ -235,14 +233,12 @@ export function DataTable({
                 {columns.map((column) => (
                   <th
                     key={column.key}
-                    className={`px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300 ${
+                    className={`px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap ${
                       sortable && column.sortable !== false
                         ? "cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
                         : ""
                     }`}
-                    onClick={() =>
-                      column.sortable !== false && handleSort(column.key)
-                    }
+                    onClick={() => column.sortable !== false && handleSort(column.key)}
                   >
                     <div className="flex items-center gap-2">
                       {column.header}
@@ -250,9 +246,9 @@ export function DataTable({
                         column.sortable !== false &&
                         sortConfig.key === column.key &&
                         (sortConfig.direction === "asc" ? (
-                          <ChevronUp className="h-4 w-4" />
+                          <ChevronUp className="h-4 w-4 flex-shrink-0" />
                         ) : (
-                          <ChevronDown className="h-4 w-4" />
+                          <ChevronDown className="h-4 w-4 flex-shrink-0" />
                         ))}
                     </div>
                   </th>
@@ -262,15 +258,9 @@ export function DataTable({
             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
               {paginatedData.length > 0 ? (
                 paginatedData.map((item, index) => (
-                  <tr
-                    key={index}
-                    className="hover:bg-gray-50 dark:hover:bg-gray-800"
-                  >
+                  <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-800">
                     {columns.map((column) => (
-                      <td
-                        key={column.key}
-                        className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100"
-                      >
+                      <td key={column.key} className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">
                         {renderCell(item, column)}
                       </td>
                     ))}
@@ -278,10 +268,7 @@ export function DataTable({
                 ))
               ) : (
                 <tr>
-                  <td
-                    colSpan={columns.length}
-                    className="px-4 py-8 text-center text-gray-500 dark:text-gray-400"
-                  >
+                  <td colSpan={columns.length} className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
                     No data found
                   </td>
                 </tr>
@@ -293,10 +280,9 @@ export function DataTable({
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between">
-          <div className="text-sm text-gray-700 dark:text-gray-300">
-            Showing {(currentPage - 1) * pageSize + 1} to{" "}
-            {Math.min(currentPage * pageSize, processedData.length)} of{" "}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="text-sm text-gray-700 dark:text-gray-300 text-center sm:text-left">
+            Showing {(currentPage - 1) * pageSize + 1} to {Math.min(currentPage * pageSize, processedData.length)} of{" "}
             {processedData.length} results
           </div>
 
@@ -306,21 +292,22 @@ export function DataTable({
               size="sm"
               onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
               disabled={currentPage === 1}
+              className="px-3"
             >
               Previous
             </Button>
 
             <div className="flex items-center gap-1">
               {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                let pageNum;
+                let pageNum
                 if (totalPages <= 5) {
-                  pageNum = i + 1;
+                  pageNum = i + 1
                 } else if (currentPage <= 3) {
-                  pageNum = i + 1;
+                  pageNum = i + 1
                 } else if (currentPage >= totalPages - 2) {
-                  pageNum = totalPages - 4 + i;
+                  pageNum = totalPages - 4 + i
                 } else {
-                  pageNum = currentPage - 2 + i;
+                  pageNum = currentPage - 2 + i
                 }
 
                 return (
@@ -333,17 +320,16 @@ export function DataTable({
                   >
                     {pageNum}
                   </Button>
-                );
+                )
               })}
             </div>
 
             <Button
               variant="outline"
               size="sm"
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(totalPages, prev + 1))
-              }
+              onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
               disabled={currentPage === totalPages}
+              className="px-3"
             >
               Next
             </Button>
@@ -351,5 +337,5 @@ export function DataTable({
         </div>
       )}
     </div>
-  );
+  )
 }

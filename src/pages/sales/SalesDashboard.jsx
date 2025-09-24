@@ -88,19 +88,19 @@ export default function SalesDashboard() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-foreground">Today's Schedule</h1>
-        <p className="text-muted-foreground">Your assigned visits for {formatDate(new Date())}</p>
+        <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Today's Schedule</h1>
+        <p className="text-sm sm:text-base text-muted-foreground">Your assigned visits for {formatDate(new Date())}</p>
       </div>
 
       {/* Today's Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Today's Visits</CardTitle>
-            <Calendar className="h-4 w-4 text-muted-foreground" />
+            <Calendar className="h-4 w-4 text-muted-foreground flex-shrink-0" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{todayMetrics.total}</div>
+            <div className="text-xl sm:text-2xl font-bold">{todayMetrics.total}</div>
             <p className="text-xs text-muted-foreground">Assigned for today</p>
           </CardContent>
         </Card>
@@ -108,10 +108,10 @@ export default function SalesDashboard() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Completed</CardTitle>
-            <CheckCircle className="h-4 w-4 text-green-500" />
+            <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-500">{todayMetrics.completed}</div>
+            <div className="text-xl sm:text-2xl font-bold text-green-500">{todayMetrics.completed}</div>
             <p className="text-xs text-muted-foreground">
               {todayMetrics.total > 0 ? Math.round((todayMetrics.completed / todayMetrics.total) * 100) : 0}% complete
             </p>
@@ -121,10 +121,10 @@ export default function SalesDashboard() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">In Progress</CardTitle>
-            <Clock className="h-4 w-4 text-yellow-500" />
+            <Clock className="h-4 w-4 text-yellow-500 flex-shrink-0" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-yellow-500">{todayMetrics.inProgress}</div>
+            <div className="text-xl sm:text-2xl font-bold text-yellow-500">{todayMetrics.inProgress}</div>
             <p className="text-xs text-muted-foreground">Currently active</p>
           </CardContent>
         </Card>
@@ -132,10 +132,10 @@ export default function SalesDashboard() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Pending</CardTitle>
-            <AlertCircle className="h-4 w-4 text-muted-foreground" />
+            <AlertCircle className="h-4 w-4 text-muted-foreground flex-shrink-0" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{todayMetrics.pending}</div>
+            <div className="text-xl sm:text-2xl font-bold">{todayMetrics.pending}</div>
             <p className="text-xs text-muted-foreground">Not started</p>
           </CardContent>
         </Card>
@@ -144,7 +144,7 @@ export default function SalesDashboard() {
       {/* Today's Tasks */}
       <Card>
         <CardHeader>
-          <CardTitle>Today's Visits</CardTitle>
+          <CardTitle className="text-base sm:text-lg">Today's Visits</CardTitle>
           <CardDescription>Your scheduled visits and their current status</CardDescription>
         </CardHeader>
         <CardContent>
@@ -159,13 +159,15 @@ export default function SalesDashboard() {
               {todayTasks.map((task) => (
                 <div
                   key={task.id}
-                  className="flex items-center justify-between p-4 border border-border rounded-lg hover:bg-accent/50 transition-colors"
+                  className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 border border-border rounded-lg hover:bg-accent/50 transition-colors gap-4"
                 >
-                  <div className="flex-1 space-y-2">
-                    <div className="flex items-center justify-between">
+                  <div className="flex-1 space-y-2 min-w-0 w-full sm:w-auto">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                       <div className="flex items-center space-x-3">
-                        <div className="text-lg font-semibold">{formatTime(task.dueAt)}</div>
-                        <Badge variant={getStatusVariant(task.status)}>{getStatusLabel(task.status)}</Badge>
+                        <div className="text-base sm:text-lg font-semibold">{formatTime(task.dueAt)}</div>
+                        <Badge variant={getStatusVariant(task.status)} className="text-xs">
+                          {getStatusLabel(task.status)}
+                        </Badge>
                       </div>
                       <div className="text-sm text-muted-foreground">
                         {task.report?.checkIn && `Checked in at ${formatTime(task.report.checkIn.at)}`}
@@ -207,28 +209,33 @@ export default function SalesDashboard() {
                     )}
                   </div>
 
-                  <div className="flex flex-col space-y-2 ml-6">
+                  <div className="flex flex-row sm:flex-col space-x-2 sm:space-x-0 sm:space-y-2 w-full sm:w-auto">
                     {task.status === "assigned" && (
-                      <Button onClick={() => handleCheckIn(task.id)} className="w-32">
+                      <Button onClick={() => handleCheckIn(task.id)} className="flex-1 sm:w-32" size="sm">
                         <MapPin className="mr-2 h-4 w-4" />
                         Check In
                       </Button>
                     )}
 
                     {task.status === "in_progress" && (
-                      <Button onClick={() => handleOpenVisitForm(task.id)} className="w-32">
+                      <Button onClick={() => handleOpenVisitForm(task.id)} className="flex-1 sm:w-32" size="sm">
                         <Play className="mr-2 h-4 w-4" />
                         Visit Form
                       </Button>
                     )}
 
                     {task.status === "completed" && (
-                      <Button variant="outline" onClick={() => handleOpenVisitForm(task.id)} className="w-32">
+                      <Button
+                        variant="outline"
+                        onClick={() => handleOpenVisitForm(task.id)}
+                        className="flex-1 sm:w-32"
+                        size="sm"
+                      >
                         View Report
                       </Button>
                     )}
 
-                    <Button variant="ghost" size="sm" className="w-32">
+                    <Button variant="ghost" size="sm" className="flex-1 sm:w-32">
                       <MapPin className="mr-2 h-4 w-4" />
                       Directions
                     </Button>
@@ -241,10 +248,10 @@ export default function SalesDashboard() {
       </Card>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         <Card className="cursor-pointer hover:bg-accent/50 transition-colors" onClick={() => navigate("/sales/tasks")}>
           <CardHeader>
-            <CardTitle className="text-lg">My Tasks</CardTitle>
+            <CardTitle className="text-base sm:text-lg">My Tasks</CardTitle>
             <CardDescription>View all your assigned tasks - today, upcoming, and completed</CardDescription>
           </CardHeader>
         </Card>
@@ -254,14 +261,14 @@ export default function SalesDashboard() {
           onClick={() => navigate("/sales/history")}
         >
           <CardHeader>
-            <CardTitle className="text-lg">Visit History</CardTitle>
+            <CardTitle className="text-base sm:text-lg">Visit History</CardTitle>
             <CardDescription>Browse your past visits and submitted reports</CardDescription>
           </CardHeader>
         </Card>
 
         <Card className="cursor-pointer hover:bg-accent/50 transition-colors">
           <CardHeader>
-            <CardTitle className="text-lg">Performance</CardTitle>
+            <CardTitle className="text-base sm:text-lg">Performance</CardTitle>
             <CardDescription>View your completion rates and performance metrics</CardDescription>
           </CardHeader>
         </Card>

@@ -231,22 +231,24 @@ export default function VisitForm() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" onClick={() => navigate("/sales")} className="hover:bg-muted/50">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 min-w-0 flex-1">
+          <Button variant="ghost" onClick={() => navigate("/sales")} className="hover:bg-muted/50 flex-shrink-0">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Tasks
           </Button>
-          <div className="space-y-1">
-            <h1 className="text-4xl font-bold tracking-tight">{isReadOnly ? "Visit Report" : "Visit Form"}</h1>
-            <p className="text-xl text-muted-foreground">
+          <div className="space-y-1 min-w-0 flex-1">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight">
+              {isReadOnly ? "Visit Report" : "Visit Form"}
+            </h1>
+            <p className="text-sm sm:text-base lg:text-xl text-muted-foreground">
               {isReadOnly ? "View submitted report" : "Complete your visit and submit report"}
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
           {task.status === "completed" && (
             <Badge variant="default" className="bg-success text-success-foreground">
               <CheckCircle className="mr-1 h-3 w-3" />
@@ -262,24 +264,24 @@ export default function VisitForm() {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
           {/* Task Information */}
           <Card className="glass-effect">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Building2 className="h-5 w-5 text-primary" />
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                <Building2 className="h-5 w-5 text-primary flex-shrink-0" />
                 Visit Details
               </CardTitle>
               <CardDescription>Pre-filled information from your assigned task</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-4 sm:space-y-6">
               <div className="space-y-4">
-                <div className="p-4 bg-muted/30 rounded-lg border border-border/50">
-                  <div className="flex items-start justify-between mb-3">
-                    <div>
-                      <div className="font-semibold text-lg">{company?.name}</div>
-                      <div className="text-muted-foreground">
+                <div className="p-3 sm:p-4 bg-muted/30 rounded-lg border border-border/50">
+                  <div className="flex flex-col sm:flex-row items-start justify-between gap-3 mb-3">
+                    <div className="min-w-0 flex-1">
+                      <div className="font-semibold text-base sm:text-lg truncate">{company?.name}</div>
+                      <div className="text-sm text-muted-foreground">
                         {company?.address.line1}, {company?.address.city}, {company?.address.state}{" "}
                         {company?.address.pincode}
                       </div>
@@ -288,6 +290,7 @@ export default function VisitForm() {
                       type="button"
                       variant="ghost"
                       size="sm"
+                      className="flex-shrink-0"
                       onClick={() => {
                         const address = `${company?.address.line1}, ${company?.address.city}, ${company?.address.state} ${company?.address.pincode}`
                         const encodedAddress = encodeURIComponent(address)
@@ -299,32 +302,32 @@ export default function VisitForm() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="p-3 bg-muted/20 rounded-lg">
                     <Label className="text-sm text-muted-foreground">Scheduled Date</Label>
-                    <div className="font-medium">{formatDate(task.dueAt)}</div>
+                    <div className="font-medium text-sm sm:text-base">{formatDate(task.dueAt)}</div>
                   </div>
                   <div className="p-3 bg-muted/20 rounded-lg">
                     <Label className="text-sm text-muted-foreground">Scheduled Time</Label>
-                    <div className="font-medium">{formatTime(task.dueAt)}</div>
+                    <div className="font-medium text-sm sm:text-base">{formatTime(task.dueAt)}</div>
                   </div>
                 </div>
 
                 {task.contactHint?.name && (
-                  <div className="p-4 bg-muted/30 rounded-lg border border-border/50">
+                  <div className="p-3 sm:p-4 bg-muted/30 rounded-lg border border-border/50">
                     <Label className="text-sm text-muted-foreground mb-2 block">Expected Contact</Label>
                     <div className="space-y-2">
-                      <div className="font-medium">
+                      <div className="font-medium text-sm sm:text-base">
                         {task.contactHint.name}
                         {task.contactHint.role && ` (${task.contactHint.role})`}
                       </div>
-                      <div className="flex items-center gap-4">
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
                         {task.contactHint.phone && (
                           <a
                             href={`tel:${task.contactHint.phone}`}
                             className="flex items-center gap-1 text-sm text-primary hover:underline"
                           >
-                            <Phone className="h-3 w-3" />
+                            <Phone className="h-3 w-3 flex-shrink-0" />
                             {task.contactHint.phone}
                           </a>
                         )}
@@ -333,8 +336,8 @@ export default function VisitForm() {
                             href={`mailto:${task.contactHint.email}`}
                             className="flex items-center gap-1 text-sm text-primary hover:underline"
                           >
-                            <Mail className="h-3 w-3" />
-                            {task.contactHint.email}
+                            <Mail className="h-3 w-3 flex-shrink-0" />
+                            <span className="truncate">{task.contactHint.email}</span>
                           </a>
                         )}
                       </div>
@@ -363,19 +366,19 @@ export default function VisitForm() {
           </Card>
 
           {/* GPS Location & Map */}
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {/* Check-in Status */}
             {checkInLocation && (
               <Card className="glass-effect border-l-4 border-l-success">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-success">
-                    <CheckCircle className="h-5 w-5" />
+                  <CardTitle className="flex items-center gap-2 text-success text-base sm:text-lg">
+                    <CheckCircle className="h-5 w-5 flex-shrink-0" />
                     Checked In
                   </CardTitle>
                   <CardDescription>{visitStartTime && `at ${formatTime(visitStartTime)}`}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-sm text-muted-foreground">
+                  <div className="text-sm text-muted-foreground break-all">
                     Location: {checkInLocation.lat.toFixed(6)}, {checkInLocation.lng.toFixed(6)}
                   </div>
                 </CardContent>
@@ -386,8 +389,8 @@ export default function VisitForm() {
             {!isReadOnly && isInProgress && (
               <Card className="glass-effect">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <MapPin className="h-5 w-5 text-primary" />
+                  <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                    <MapPin className="h-5 w-5 text-primary flex-shrink-0" />
                     Check-out Location
                   </CardTitle>
                   <CardDescription>Capture your location when leaving the visit</CardDescription>
@@ -402,13 +405,13 @@ export default function VisitForm() {
             {mapPositions.length > 0 && (
               <Card className="glass-effect">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Navigation className="h-5 w-5 text-info" />
+                  <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                    <Navigation className="h-5 w-5 text-info flex-shrink-0" />
                     Visit Locations
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <Map positions={mapPositions} height="300px" />
+                  <Map positions={mapPositions} height="250px" className="sm:h-[300px]" />
                 </CardContent>
               </Card>
             )}
@@ -418,75 +421,92 @@ export default function VisitForm() {
         {/* Visit Details & Contact Information */}
         <Card className="glass-effect">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <User className="h-5 w-5 text-primary" />
+            <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+              <User className="h-5 w-5 text-primary flex-shrink-0" />
               Visit Details & Contact Information
             </CardTitle>
             <CardDescription>Fill in the details from your visit as per the requirements</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-4 sm:space-y-6">
             {/* Project Name & Address */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
               <div className="space-y-2">
-                <Label htmlFor="projectName">Project Name</Label>
+                <Label htmlFor="projectName" className="text-sm font-medium">
+                  Project Name
+                </Label>
                 <Input
                   id="projectName"
                   placeholder="Enter project name"
                   value={formData.projectName}
                   onChange={(e) => handleInputChange("projectName", e.target.value)}
                   disabled={isReadOnly}
+                  className="w-full"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="address">Address</Label>
+                <Label htmlFor="address" className="text-sm font-medium">
+                  Address
+                </Label>
                 <Input
                   id="address"
                   placeholder="Visit address"
                   value={formData.address}
                   onChange={(e) => handleInputChange("address", e.target.value)}
                   disabled={isReadOnly}
+                  className="w-full"
                 />
               </div>
             </div>
 
             {/* POC & Department */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
               <div className="space-y-2">
-                <Label htmlFor="actualContactName">POC (Point of Contact)</Label>
+                <Label htmlFor="actualContactName" className="text-sm font-medium">
+                  POC (Point of Contact)
+                </Label>
                 <Input
                   id="actualContactName"
                   placeholder="Full name"
                   value={formData.actualContactName}
                   onChange={(e) => handleInputChange("actualContactName", e.target.value)}
                   disabled={isReadOnly}
+                  className="w-full"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="department">Department</Label>
+                <Label htmlFor="department" className="text-sm font-medium">
+                  Department
+                </Label>
                 <Input
                   id="department"
                   placeholder="e.g., IT, Sales, Marketing"
                   value={formData.department}
                   onChange={(e) => handleInputChange("department", e.target.value)}
                   disabled={isReadOnly}
+                  className="w-full"
                 />
               </div>
             </div>
 
             {/* Contact Phone & Email */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
               <div className="space-y-2">
-                <Label htmlFor="actualContactPhone">Contact (Phone)</Label>
+                <Label htmlFor="actualContactPhone" className="text-sm font-medium">
+                  Contact (Phone)
+                </Label>
                 <Input
                   id="actualContactPhone"
                   placeholder="+91-XXXXXXXXXX"
                   value={formData.actualContactPhone}
                   onChange={(e) => handleInputChange("actualContactPhone", e.target.value)}
                   disabled={isReadOnly}
+                  className="w-full"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="actualContactEmail">Email</Label>
+                <Label htmlFor="actualContactEmail" className="text-sm font-medium">
+                  Email
+                </Label>
                 <Input
                   id="actualContactEmail"
                   type="email"
@@ -494,42 +514,52 @@ export default function VisitForm() {
                   value={formData.actualContactEmail}
                   onChange={(e) => handleInputChange("actualContactEmail", e.target.value)}
                   disabled={isReadOnly}
+                  className="w-full"
                 />
               </div>
             </div>
 
             {/* Contact Role & Product Pitched */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
               <div className="space-y-2">
-                <Label htmlFor="actualContactRole">Designation</Label>
+                <Label htmlFor="actualContactRole" className="text-sm font-medium">
+                  Designation
+                </Label>
                 <Input
                   id="actualContactRole"
                   placeholder="e.g., CEO, Manager"
                   value={formData.actualContactRole}
                   onChange={(e) => handleInputChange("actualContactRole", e.target.value)}
                   disabled={isReadOnly}
+                  className="w-full"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="productPitched">Product Pitched</Label>
+                <Label htmlFor="productPitched" className="text-sm font-medium">
+                  Product Pitched
+                </Label>
                 <Input
                   id="productPitched"
                   placeholder="Product or service presented"
                   value={formData.productPitched}
                   onChange={(e) => handleInputChange("productPitched", e.target.value)}
                   disabled={isReadOnly}
+                  className="w-full"
                 />
               </div>
             </div>
 
             {/* Meeting Type */}
             <div className="space-y-2">
-              <Label htmlFor="meetingType">Meeting (Type/Status)</Label>
+              <Label htmlFor="meetingType" className="text-sm font-medium">
+                Meeting (Type/Status)
+              </Label>
               <Select
                 id="meetingType"
                 value={formData.meetingType}
                 onChange={(e) => handleInputChange("meetingType", e.target.value)}
                 disabled={isReadOnly}
+                className="w-full"
               >
                 <option value="">Select meeting type/status</option>
                 <option value="in_person">In-Person Meeting</option>
@@ -549,22 +579,25 @@ export default function VisitForm() {
         {/* Visit Outcome */}
         <Card className="glass-effect">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-primary" />
+            <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+              <FileText className="h-5 w-5 text-primary flex-shrink-0" />
               Visit Outcome & Remarks
             </CardTitle>
             <CardDescription>Record the results and next steps from your visit</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CardContent className="space-y-4 sm:space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
               <div className="space-y-2">
-                <Label htmlFor="outcome">Outcome *</Label>
+                <Label htmlFor="outcome" className="text-sm font-medium">
+                  Outcome *
+                </Label>
                 <Select
                   id="outcome"
                   value={formData.outcome}
                   onChange={(e) => handleInputChange("outcome", e.target.value)}
                   required
                   disabled={isReadOnly}
+                  className="w-full"
                 >
                   <option value="">Select outcome</option>
                   <option value="met">Met - Successful meeting</option>
@@ -576,7 +609,9 @@ export default function VisitForm() {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="orderValue">Order Value (₹)</Label>
+                <Label htmlFor="orderValue" className="text-sm font-medium">
+                  Order Value (₹)
+                </Label>
                 <Input
                   id="orderValue"
                   type="number"
@@ -584,23 +619,29 @@ export default function VisitForm() {
                   value={formData.orderValue}
                   onChange={(e) => handleInputChange("orderValue", e.target.value)}
                   disabled={isReadOnly}
+                  className="w-full"
                 />
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
               <div className="space-y-2">
-                <Label htmlFor="nextFollowUpDate">Next Follow-up Date</Label>
+                <Label htmlFor="nextFollowUpDate" className="text-sm font-medium">
+                  Next Follow-up Date
+                </Label>
                 <Input
                   id="nextFollowUpDate"
                   type="date"
                   value={formData.nextFollowUpDate}
                   onChange={(e) => handleInputChange("nextFollowUpDate", e.target.value)}
                   disabled={isReadOnly}
+                  className="w-full"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="visitDuration">Visit Duration (minutes)</Label>
+                <Label htmlFor="visitDuration" className="text-sm font-medium">
+                  Visit Duration (minutes)
+                </Label>
                 <Input
                   id="visitDuration"
                   type="number"
@@ -608,15 +649,18 @@ export default function VisitForm() {
                   value={formData.visitDuration}
                   onChange={(e) => handleInputChange("visitDuration", e.target.value)}
                   disabled={isReadOnly}
+                  className="w-full"
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="notes">Remark</Label>
+              <Label htmlFor="notes" className="text-sm font-medium">
+                Remark
+              </Label>
               <textarea
                 id="notes"
-                className="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex min-h-[100px] sm:min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-y"
                 placeholder="Detailed notes about the visit, discussion points, client feedback, etc."
                 value={formData.notes}
                 onChange={(e) => handleInputChange("notes", e.target.value)}
@@ -628,14 +672,14 @@ export default function VisitForm() {
 
         {/* Submit Button */}
         {!isReadOnly && (
-          <div className="flex justify-end gap-4">
-            <Button type="button" variant="outline" onClick={() => navigate("/sales")}>
+          <div className="flex flex-col sm:flex-row justify-end gap-4">
+            <Button type="button" variant="outline" onClick={() => navigate("/sales")} className="w-full sm:w-auto">
               Cancel
             </Button>
             <Button
               type="submit"
               disabled={isSubmitting || !formData.outcome || !checkOutLocation}
-              className="bg-primary hover:bg-primary/90"
+              className="bg-primary hover:bg-primary/90 w-full sm:w-auto"
             >
               {isSubmitting ? (
                 "Submitting..."
