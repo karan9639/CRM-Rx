@@ -37,12 +37,12 @@ export default function Sidebar({ role, sidebarOpen, setSidebarOpen }) {
     <>
       <aside
         className={cn(
-          "fixed lg:static inset-y-0 left-0 z-50 w-64 bg-slate-900/50 backdrop-blur-xl border-r border-slate-700/50 transform transition-transform duration-300 ease-in-out lg:transform-none",
+          "fixed lg:static inset-y-0 left-0 z-50 w-64 bg-slate-900/95 backdrop-blur-xl border-r border-slate-700/50 transform transition-transform duration-300 ease-in-out lg:transform-none lg:bg-slate-900/50",
           sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
         )}
       >
-        <div className="p-6">
-          <div className="flex items-center justify-between mb-8 lg:justify-start">
+        <div className="p-4 lg:p-6 h-full overflow-y-auto">
+          <div className="flex items-center justify-between mb-6 lg:mb-8 lg:justify-start">
             <div className="flex items-center space-x-3">
               <div className="p-2 bg-gradient-to-br from-purple-500 to-blue-600 rounded-lg">
                 <Building2 className="h-6 w-6 text-white" />
@@ -55,7 +55,7 @@ export default function Sidebar({ role, sidebarOpen, setSidebarOpen }) {
             <Button
               variant="ghost"
               size="sm"
-              className="lg:hidden text-slate-400 hover:text-white"
+              className="lg:hidden text-slate-400 hover:text-white hover:bg-slate-800/50"
               onClick={() => setSidebarOpen(false)}
             >
               <X className="h-5 w-5" />

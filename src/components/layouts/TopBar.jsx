@@ -21,18 +21,18 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
           </Button>
 
           <div>
-            <h1 className="text-lg md:text-xl font-bold text-white">
+            <h1 className="text-base sm:text-lg md:text-xl font-bold text-white">
               {user?.role === "admin" ? "Admin Dashboard" : "Sales Dashboard"}
             </h1>
-            <p className="text-sm text-slate-400 hidden sm:block">Welcome back, {user?.name}</p>
+            <p className="text-xs sm:text-sm text-slate-400 hidden sm:block">Welcome back, {user?.name}</p>
           </div>
         </div>
 
-        <div className="flex items-center space-x-2 md:space-x-4">
+        <div className="flex items-center space-x-1 sm:space-x-2 md:space-x-4">
           <Button
             variant="ghost"
             size="icon"
-            className="text-slate-300 hover:text-white hover:bg-slate-800/50 border border-transparent hover:border-slate-600/50 rounded-xl hidden sm:flex"
+            className="text-slate-300 hover:text-white hover:bg-slate-800/50 border border-transparent hover:border-slate-600/50 rounded-xl hidden md:flex"
           >
             <Bell className="h-5 w-5" />
           </Button>
@@ -40,7 +40,7 @@ export default function TopBar({ sidebarOpen, setSidebarOpen }) {
           <Button
             variant="ghost"
             size="icon"
-            className="text-slate-300 hover:text-white hover:bg-slate-800/50 border border-transparent hover:border-slate-600/50 rounded-xl hidden sm:flex"
+            className="text-slate-300 hover:text-white hover:bg-slate-800/50 border border-transparent hover:border-slate-600/50 rounded-xl hidden md:flex"
           >
             <Settings className="h-5 w-5" />
           </Button>

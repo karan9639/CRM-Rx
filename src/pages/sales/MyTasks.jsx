@@ -236,7 +236,12 @@ export default function MyTasks() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             {tabs.find((tab) => tab.id === activeTab)?.icon && (
-              <div className="h-5 w-5">{tabs.find((tab) => tab.id === activeTab).icon}</div>
+              <div className="h-5 w-5">
+                {(() => {
+                  const IconComponent = tabs.find((tab) => tab.id === activeTab).icon
+                  return <IconComponent />
+                })()}
+              </div>
             )}
             {tabs.find((tab) => tab.id === activeTab)?.label} Tasks
           </CardTitle>
