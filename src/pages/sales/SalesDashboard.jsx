@@ -235,10 +235,10 @@ export default function SalesDashboard() {
                       </Button>
                     )}
 
-                    <Button variant="ghost" size="sm" className="flex-1 sm:w-32">
+                    {/* <Button variant="ghost" size="sm" className="flex-1 sm:w-32">
                       <MapPin className="mr-2 h-4 w-4" />
                       Directions
-                    </Button>
+                    </Button> */}
                   </div>
                 </div>
               ))}
