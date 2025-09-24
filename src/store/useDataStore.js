@@ -1,6 +1,6 @@
-import { create } from "zustand"
-import { persist } from "zustand/middleware"
-import { generateSeedData } from "../utils/seedData"
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
+import { generateSeedData } from "../utils/seedData";
 
 /**
  * @typedef {Object} Company
@@ -58,42 +58,60 @@ export const useDataStore = create(
 
       // Initialize with seed data
       initialize: () => {
-        const { isInitialized } = get()
+        const { isInitialized } = get();
         if (!isInitialized) {
-          const seedData = generateSeedData()
+          const seedData = generateSeedData();
           set({
             users: seedData.users,
             companies: seedData.companies,
             tasks: seedData.tasks,
             visitReports: seedData.visitReports,
             isInitialized: true,
-          })
+          });
         }
       },
 
       // Reset data
       resetData: () => {
-        const seedData = generateSeedData()
+        const seedData = generateSeedData();
         set({
           users: seedData.users,
           companies: seedData.companies,
           tasks: seedData.tasks,
           visitReports: seedData.visitReports,
           isInitialized: true,
-        })
+        });
+      },
+
+      addUser: (user) => {
+        const newUser = {
+          ...user,
+          id: Date.now().toString(),
+          createdAt: new Date().toISOString(),
+          isActive: true,
+        };
+        set((state) => ({
+          users: [...state.users, newUser],
+        }));
+        return newUser;
       },
 
       // Companies CRUD
       addCompany: (company) => {
         set((state) => ({
-          companies: [...state.companies, { ...company, id: Date.now().toString() }],
-        }))
+          companies: [
+            ...state.companies,
+            { ...company, id: Date.now().toString() },
+          ],
+        }));
       },
 
       updateCompany: (id, updates) => {
         set((state) => ({
-          companies: state.companies.map((company) => (company.id === id ? { ...company, ...updates } : company)),
-        }))
+          companies: state.companies.map((company) =>
+            company.id === id ? { ...company, ...updates } : company
+          ),
+        }));
       },
 
       // Tasks CRUD
@@ -104,19 +122,21 @@ export const useDataStore = create(
           status: "assigned",
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
-        }
+        };
         set((state) => ({
           tasks: [...state.tasks, newTask],
-        }))
-        return newTask
+        }));
+        return newTask;
       },
 
       updateTask: (id, updates) => {
         set((state) => ({
           tasks: state.tasks.map((task) =>
-            task.id === id ? { ...task, ...updates, updatedAt: new Date().toISOString() } : task,
+            task.id === id
+              ? { ...task, ...updates, updatedAt: new Date().toISOString() }
+              : task
           ),
-        }))
+        }));
       },
 
       // Visit Reports CRUD
@@ -125,37 +145,37 @@ export const useDataStore = create(
           ...report,
           id: Date.now().toString(),
           submittedAt: new Date().toISOString(),
-        }
+        };
         set((state) => ({
           visitReports: [...state.visitReports, newReport],
-        }))
-        return newReport
+        }));
+        return newReport;
       },
 
       // Getters
       getTasksByUser: (userId) => {
-        const { tasks } = get()
-        return tasks.filter((task) => task.salespersonId === userId)
+        const { tasks } = get();
+        return tasks.filter((task) => task.salespersonId === userId);
       },
 
       getTasksByCompany: (companyId) => {
-        const { tasks } = get()
-        return tasks.filter((task) => task.companyId === companyId)
+        const { tasks } = get();
+        return tasks.filter((task) => task.companyId === companyId);
       },
 
       getVisitReportsByTask: (taskId) => {
-        const { visitReports } = get()
-        return visitReports.filter((report) => report.taskId === taskId)
+        const { visitReports } = get();
+        return visitReports.filter((report) => report.taskId === taskId);
       },
 
       getVisitReportsByCompany: (companyId) => {
-        const { visitReports } = get()
-        return visitReports.filter((report) => report.companyId === companyId)
+        const { visitReports } = get();
+        return visitReports.filter((report) => report.companyId === companyId);
       },
     }),
     {
       name: "crm-data",
       version: 1,
-    },
-  ),
-)
+    }
+  )
+);

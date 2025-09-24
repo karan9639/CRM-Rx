@@ -1,210 +1,252 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Link, Navigate } from "react-router-dom"
-import { useAuthStore } from "@/store/useAuthStore"
-import { useDataStore } from "@/store/useDataStore"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
-import { Select } from "@/components/ui/select"
-import { Building2, Users, Shield, TrendingUp, UserPlus } from "lucide-react"
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Building2, Eye, EyeOff, Mail, Lock } from "lucide-react";
+import { useAuthStore } from "@/store/useAuthStore";
+import { authenticateUser } from "@/utils/demoCredentials";
+
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
 
 export default function Login() {
-  const { login, isAuthenticated } = useAuthStore()
-  const { users, initialize } = useDataStore()
-  const [selectedRole, setSelectedRole] = useState("admin")
-  const [selectedUser, setSelectedUser] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
-  // Initialize data store on component mount
-  useEffect(() => {
-    initialize()
-  }, [initialize])
+  const { login, setLoading, setError, clearError, isLoading, error } =
+    useAuthStore();
+  const navigate = useNavigate();
 
-  // Filter users based on selected role
-  const availableUsers = users.filter((user) => user.role === selectedRole)
+  const emailError =
+    (submitted || email) && !isValidEmail(email) ? "Enter a valid email." : "";
+  const passwordError =
+    (submitted || password) && password.length < 6
+      ? "Password must be at least 6 characters."
+      : "";
 
-  // Auto-select first user when role changes
-  useEffect(() => {
-    if (availableUsers.length > 0) {
-      setSelectedUser(availableUsers[0].id)
-    } else {
-      setSelectedUser("")
+  const canSubmit = isValidEmail(email) && password.length >= 6 && !isLoading;
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitted(true);
+    clearError();
+
+    if (!canSubmit) return;
+
+    setLoading(true);
+    try {
+      console.log("[v0] Attempting login with:", { email, password });
+
+      // Simulate API delay for better UX
+      await new Promise((r) => setTimeout(r, 700));
+
+      const user = authenticateUser(email, password);
+
+      if (user) {
+        console.log("[v0] Login successful for user:", user.name);
+
+        // Login user through auth store
+        login({
+          id: user.id,
+          name: user.name,
+          role: user.role,
+          phone: user.phone,
+          email: user.email,
+        });
+
+        // Navigate based on user role
+        const redirectPath = user.role === "admin" ? "/admin" : "/sales";
+        console.log("[v0] Redirecting to:", redirectPath);
+        navigate(redirectPath);
+      } else {
+        console.log("[v0] Login failed - invalid credentials");
+        setError("Invalid email or password. Please try again.");
+      }
+    } catch (error) {
+      console.error("[v0] Login error:", error);
+      setError("An error occurred during login. Please try again.");
     }
-  }, [selectedRole, availableUsers])
-
-  const handleLogin = async () => {
-    const user = users.find((u) => u.id === selectedUser)
-    if (user) {
-      setIsLoading(true)
-      await new Promise((resolve) => setTimeout(resolve, 800))
-      login(user)
-      setIsLoading(false)
-    }
-  }
-
-  // Redirect if already authenticated
-  if (isAuthenticated) {
-    return <Navigate to="/" replace />
-  }
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
-      <div className="w-full max-w-md space-y-6 sm:space-y-8">
-        {/* Header */}
-        <div className="text-center">
-          <div className="flex justify-center mb-4 sm:mb-6">
-            <div className="p-3 sm:p-4 bg-gradient-to-br from-purple-500 to-blue-600 rounded-2xl shadow-2xl shadow-purple-500/20">
-              <Building2 className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        {/* Brand */}
+        <div className="text-center mb-6">
+          <div className="flex justify-center mb-4">
+            <div className="p-4 bg-gradient-to-br from-purple-500 to-blue-600 rounded-2xl shadow-2xl shadow-purple-500/20">
+              <Building2 className="h-10 w-10 text-white" />
             </div>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">CRM System</h1>
-          <p className="text-slate-400 text-base sm:text-lg">Professional Sales Management</p>
+          <h1 className="text-3xl font-bold text-white">CRM System</h1>
+          <p className="text-slate-400">Professional Sales Management</p>
         </div>
 
-        {/* Login Card */}
-        <Card className="bg-slate-800/50 backdrop-blur-xl border-slate-700/50 shadow-2xl">
-          <CardHeader className="text-center pb-4 sm:pb-6">
-            <CardTitle className="text-white text-lg sm:text-xl">Welcome Back</CardTitle>
-            <CardDescription className="text-slate-400 text-sm sm:text-base">
-              Select your role and account to continue
+        {/* Card */}
+        <Card className="bg-slate-800/50 backdrop-blur-xl border-slate-700/60 shadow-2xl rounded-2xl">
+          <CardHeader className="pb-4 text-center">
+            <CardTitle className="text-white text-xl">Welcome Back</CardTitle>
+            <CardDescription className="text-slate-400">
+              Sign in with your email and password
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4 sm:space-y-6">
-            {/* Role Selection */}
-            <div className="space-y-2 sm:space-y-3">
-              <Label htmlFor="role" className="text-white font-medium text-sm sm:text-base">
-                Role
-              </Label>
-              <Select
-                id="role"
-                value={selectedRole}
-                onChange={(e) => setSelectedRole(e.target.value)}
-                className="bg-slate-700/50 border-slate-600/50 text-white rounded-xl h-11 sm:h-12 text-sm sm:text-base"
+
+          <CardContent>
+            {/* Demo credentials info */}
+            <div className="mb-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+              <p className="text-blue-300 text-sm font-medium mb-2">
+                Demo Credentials:
+              </p>
+              <div className="text-xs text-blue-200 space-y-1">
+                <div>Admin: admin@crm.com / admin123</div>
+                <div>Sales: rajesh@crm.com / sales123</div>
+              </div>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-5">
+              {error && (
+                <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
+                  <p className="text-red-400 text-sm">{error}</p>
+                </div>
+              )}
+
+              {/* Email */}
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-white font-medium">
+                  Email
+                </Label>
+                <div className="relative">
+                  <span className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                    <Mail className="h-5 w-5 text-slate-400" />
+                  </span>
+                  <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    inputMode="email"
+                    autoComplete="email"
+                    placeholder="you@company.com"
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      if (error) clearError(); // Clear error when user starts typing
+                    }}
+                    aria-invalid={!!emailError}
+                    aria-describedby={emailError ? "email-error" : undefined}
+                    className="pl-10 h-11 bg-slate-700/50 border-slate-600/60 text-white placeholder:text-slate-400 rounded-xl"
+                  />
+                </div>
+                {emailError ? (
+                  <p
+                    id="email-error"
+                    className="text-rose-400 text-sm"
+                    role="alert"
+                    aria-live="polite"
+                  >
+                    {emailError}
+                  </p>
+                ) : null}
+              </div>
+
+              {/* Password */}
+              <div className="space-y-2">
+                <Label htmlFor="password" className="text-white font-medium">
+                  Password
+                </Label>
+                <div className="relative">
+                  <span className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                    <Lock className="h-5 w-5 text-slate-400" />
+                  </span>
+
+                  <Input
+                    id="password"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    autoComplete="current-password"
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      if (error) clearError(); // Clear error when user starts typing
+                    }}
+                    aria-invalid={!!passwordError}
+                    aria-describedby={
+                      passwordError ? "password-error" : undefined
+                    }
+                    className="pl-10 pr-10 h-11 bg-slate-700/50 border-slate-600/60 text-white placeholder:text-slate-400 rounded-xl"
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((s) => !s)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                    aria-label={
+                      showPassword ? "Hide password" : "Show password"
+                    }
+                    aria-pressed={showPassword}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-5 w-5" />
+                    ) : (
+                      <Eye className="h-5 w-5" />
+                    )}
+                  </button>
+                </div>
+                {passwordError ? (
+                  <p
+                    id="password-error"
+                    className="text-rose-400 text-sm"
+                    role="alert"
+                    aria-live="polite"
+                  >
+                    {passwordError}
+                  </p>
+                ) : null}
+              </div>
+
+              {/* Submit */}
+              <Button
+                type="submit"
+                className="w-full h-11 bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 text-white font-medium rounded-xl shadow-lg shadow-purple-500/20 disabled:opacity-60 disabled:cursor-not-allowed"
+                disabled={!canSubmit}
+                aria-busy={isLoading}
               >
-                <option value="admin">Administrator</option>
-                <option value="sales">Sales Representative</option>
-              </Select>
-            </div>
+                {isLoading ? (
+                  <span className="flex items-center gap-2">
+                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Signing in...
+                  </span>
+                ) : (
+                  "Sign In"
+                )}
+              </Button>
 
-            {/* User Selection */}
-            <div className="space-y-2 sm:space-y-3">
-              <Label htmlFor="user" className="text-white font-medium text-sm sm:text-base">
-                User Account
-              </Label>
-              {availableUsers.length > 0 ? (
-                <Select
-                  id="user"
-                  value={selectedUser}
-                  onChange={(e) => setSelectedUser(e.target.value)}
-                  className="bg-slate-700/50 border-slate-600/50 text-white rounded-xl h-11 sm:h-12 text-sm sm:text-base"
-                >
-                  {availableUsers.map((user) => (
-                    <option key={user.id} value={user.id}>
-                      {user.name} ({user.email})
-                    </option>
-                  ))}
-                </Select>
-              ) : (
-                <div className="p-3 bg-slate-700/30 border border-slate-600/50 rounded-xl text-slate-400 text-sm text-center">
-                  No {selectedRole} users available
-                </div>
-              )}
-            </div>
-
-            {/* Login Button */}
-            <Button
-              onClick={handleLogin}
-              className="w-full bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 text-white font-medium py-3 sm:py-4 rounded-xl shadow-lg shadow-purple-500/20 transition-all duration-200 text-sm sm:text-base h-11 sm:h-12"
-              disabled={!selectedUser || isLoading}
-            >
-              {isLoading ? (
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Signing In...
-                </div>
-              ) : (
-                <>
-                  <Users className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-                  Sign In to Dashboard
-                </>
-              )}
-            </Button>
-
-            {/* Signup Link */}
-            <div className="text-center pt-2">
-              <p className="text-slate-400 text-sm">
-                Don't have an account?{" "}
+              <p className="text-center text-slate-400 text-sm">
+                Don&apos;t have an account?{" "}
                 <Link
-                  to="/auth/signup"
-                  className="text-purple-400 hover:text-purple-300 font-medium transition-colors inline-flex items-center gap-1"
+                  to="/signup"
+                  className="text-purple-400 hover:text-purple-300 font-medium"
                 >
-                  <UserPlus className="h-3 w-3" />
                   Create Account
                 </Link>
               </p>
-            </div>
-
-            {/* Demo Info */}
-            <div className="text-center text-xs sm:text-sm text-slate-400 bg-slate-700/30 rounded-xl p-3">
-              <p>Demo Application - No authentication required</p>
-            </div>
+            </form>
           </CardContent>
         </Card>
-
-        {/* Role Info Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-sm">
-          <Card className="bg-slate-800/30 backdrop-blur-xl border-slate-700/50 p-3 sm:p-4">
-            <div className="flex items-center space-x-2 mb-2 sm:mb-3">
-              <Shield className="h-4 w-4 sm:h-5 sm:w-5 text-purple-400 flex-shrink-0" />
-              <h3 className="font-semibold text-white text-sm sm:text-base">Admin Features</h3>
-            </div>
-            <ul className="text-slate-300 space-y-1.5 sm:space-y-2 text-xs sm:text-sm">
-              <li className="flex items-center space-x-2">
-                <div className="w-1.5 h-1.5 bg-purple-400 rounded-full flex-shrink-0"></div>
-                <span>Assign tasks to sales team</span>
-              </li>
-              <li className="flex items-center space-x-2">
-                <div className="w-1.5 h-1.5 bg-purple-400 rounded-full flex-shrink-0"></div>
-                <span>Monitor daily activities</span>
-              </li>
-              <li className="flex items-center space-x-2">
-                <div className="w-1.5 h-1.5 bg-purple-400 rounded-full flex-shrink-0"></div>
-                <span>Manage companies & contacts</span>
-              </li>
-              <li className="flex items-center space-x-2">
-                <div className="w-1.5 h-1.5 bg-purple-400 rounded-full flex-shrink-0"></div>
-                <span>View comprehensive reports</span>
-              </li>
-            </ul>
-          </Card>
-          <Card className="bg-slate-800/30 backdrop-blur-xl border-slate-700/50 p-3 sm:p-4">
-            <div className="flex items-center space-x-2 mb-2 sm:mb-3">
-              <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-blue-400 flex-shrink-0" />
-              <h3 className="font-semibold text-white text-sm sm:text-base">Sales Features</h3>
-            </div>
-            <ul className="text-slate-300 space-y-1.5 sm:space-y-2 text-xs sm:text-sm">
-              <li className="flex items-center space-x-2">
-                <div className="w-1.5 h-1.5 bg-blue-400 rounded-full flex-shrink-0"></div>
-                <span>View assigned tasks</span>
-              </li>
-              <li className="flex items-center space-x-2">
-                <div className="w-1.5 h-1.5 bg-blue-400 rounded-full flex-shrink-0"></div>
-                <span>Check-in/out with GPS</span>
-              </li>
-              <li className="flex items-center space-x-2">
-                <div className="w-1.5 h-1.5 bg-blue-400 rounded-full flex-shrink-0"></div>
-                <span>Submit visit reports</span>
-              </li>
-              <li className="flex items-center space-x-2">
-                <div className="w-1.5 h-1.5 bg-blue-400 rounded-full flex-shrink-0"></div>
-                <span>Track visit history</span>
-              </li>
-            </ul>
-          </Card>
-        </div>
       </div>
     </div>
-  )
+  );
 }
