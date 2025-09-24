@@ -1,52 +1,46 @@
-"use client";
+"use client"
 
-import { useState, useEffect } from "react";
-import { Navigate } from "react-router-dom";
-import { useAuthStore } from "@/store/useAuthStore";
-import { useDataStore } from "@/store/useDataStore";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Select } from "@/components/ui/select";
-import { Building2, Users, Shield, TrendingUp } from "lucide-react";
+import { useState, useEffect } from "react"
+import { Navigate } from "react-router-dom"
+import { useAuthStore } from "@/store/useAuthStore"
+import { useDataStore } from "@/store/useDataStore"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Label } from "@/components/ui/label"
+import { Select } from "@/components/ui/select"
+import { Building2, Users, Shield, TrendingUp } from "lucide-react"
 
 export default function Login() {
-  const { login, isAuthenticated } = useAuthStore();
-  const { users, initialize } = useDataStore();
-  const [selectedRole, setSelectedRole] = useState("admin");
-  const [selectedUser, setSelectedUser] = useState("");
+  const { login, isAuthenticated } = useAuthStore()
+  const { users, initialize } = useDataStore()
+  const [selectedRole, setSelectedRole] = useState("admin")
+  const [selectedUser, setSelectedUser] = useState("")
 
   // Initialize data store on component mount
   useEffect(() => {
-    initialize();
-  }, [initialize]);
+    initialize()
+  }, [initialize])
 
   // Filter users based on selected role
-  const availableUsers = users.filter((user) => user.role === selectedRole);
+  const availableUsers = users.filter((user) => user.role === selectedRole)
 
   // Auto-select first user when role changes
   useEffect(() => {
     if (availableUsers.length > 0) {
-      setSelectedUser(availableUsers[0].id);
+      setSelectedUser(availableUsers[0].id)
     }
-  }, [selectedRole, availableUsers]);
+  }, [selectedRole, availableUsers])
 
   const handleLogin = () => {
-    const user = users.find((u) => u.id === selectedUser);
+    const user = users.find((u) => u.id === selectedUser)
     if (user) {
-      login(user);
+      login(user)
     }
-  };
+  }
 
   // Redirect if already authenticated
   if (isAuthenticated) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/" replace />
   }
 
   return (
@@ -60,18 +54,14 @@ export default function Login() {
             </div>
           </div>
           <h1 className="text-4xl font-bold text-white mb-2">CRM System</h1>
-          <p className="text-slate-400 text-lg">
-            Professional Sales Management
-          </p>
+          <p className="text-slate-400 text-lg">Professional Sales Management</p>
         </div>
 
         {/* Login Card */}
         <Card className="bg-slate-800/50 backdrop-blur-xl border-slate-700/50 shadow-2xl">
           <CardHeader className="text-center">
             <CardTitle className="text-white text-xl">Welcome Back</CardTitle>
-            <CardDescription className="text-slate-400">
-              Select your role and account to continue
-            </CardDescription>
+            <CardDescription className="text-slate-400">Select your role and account to continue</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Role Selection */}
@@ -179,5 +169,5 @@ export default function Login() {
         </div>
       </div>
     </div>
-  );
+  )
 }

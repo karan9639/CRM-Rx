@@ -14,6 +14,7 @@ import CompaniesList from "./pages/admin/CompaniesList"
 import CompanyDetail from "./pages/admin/CompanyDetail"
 import AllTasks from "./pages/admin/AllTasks"
 import Settings from "./pages/admin/Settings"
+import UserHistory from "./pages/admin/UserHistory"
 
 // Sales Pages
 import SalesDashboard from "./pages/sales/SalesDashboard"
@@ -26,7 +27,12 @@ function App() {
 
   return (
     <ToastProvider>
-      <Router>
+      <Router
+        future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true,
+        }}
+      >
         <Routes>
           <Route path="/login" element={<Login />} />
 
@@ -41,6 +47,7 @@ function App() {
           >
             <Route index element={<AdminDashboard />} />
             <Route path="users" element={<UsersList />} />
+            <Route path="users/:userId/history" element={<UserHistory />} />
             <Route path="assign-task" element={<AssignTask />} />
             <Route path="companies" element={<CompaniesList />} />
             <Route path="companies/:id" element={<CompanyDetail />} />

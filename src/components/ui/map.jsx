@@ -14,6 +14,7 @@ export default function Map({ positions = [], center, zoom = 13, height = "300px
   const mapRef = useRef(null)
   const [mapError, setMapError] = useState(false)
   const [leafletMap, setLeafletMap] = useState(null)
+  const mapInitialized = useRef(false)
 
   // Try to load Leaflet and create map
   useEffect(() => {
@@ -21,6 +22,10 @@ export default function Map({ positions = [], center, zoom = 13, height = "300px
 
     const initializeMap = async () => {
       try {
+        if (mapInitialized.current || !mapRef.current) {
+          return
+        }
+
         // Dynamically import Leaflet
         const L = await import("leaflet")
         await import("leaflet/dist/leaflet.css")
@@ -33,45 +38,48 @@ export default function Map({ positions = [], center, zoom = 13, height = "300px
           shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
         })
 
-        if (mapRef.current && !leafletMap) {
-          // Create map
-          map = L.map(mapRef.current).setView(
-            center ? [center.lat, center.lng] : [28.6139, 77.209], // Default to Delhi
-            zoom,
-          )
+        if (mapRef.current._leaflet_id) {
+          return
+        }
 
-          // Add tile layer
-          L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-            attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-            maxZoom: 19,
-          }).addTo(map)
+        // Create map
+        map = L.map(mapRef.current).setView(
+          center ? [center.lat, center.lng] : [28.6139, 77.209], // Default to Delhi
+          zoom,
+        )
 
-          // Add markers for positions
-          positions.forEach((position, index) => {
-            if (position.lat && position.lng) {
-              const marker = L.marker([position.lat, position.lng]).addTo(map)
+        // Add tile layer
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+          maxZoom: 19,
+        }).addTo(map)
 
-              if (position.title) {
-                marker.bindPopup(position.title)
-              }
+        // Add markers for positions
+        positions.forEach((position, index) => {
+          if (position.lat && position.lng) {
+            const marker = L.marker([position.lat, position.lng]).addTo(map)
 
-              if (position.description) {
-                marker.bindTooltip(position.description)
-              }
+            if (position.title) {
+              marker.bindPopup(position.title)
             }
-          })
 
-          // If we have positions, fit bounds
-          if (positions.length > 0) {
-            const validPositions = positions.filter((p) => p.lat && p.lng)
-            if (validPositions.length > 0) {
-              const group = new L.featureGroup(validPositions.map((p) => L.marker([p.lat, p.lng])))
-              map.fitBounds(group.getBounds().pad(0.1))
+            if (position.description) {
+              marker.bindTooltip(position.description)
             }
           }
+        })
 
-          setLeafletMap(map)
+        // If we have positions, fit bounds
+        if (positions.length > 0) {
+          const validPositions = positions.filter((p) => p.lat && p.lng)
+          if (validPositions.length > 0) {
+            const group = new L.featureGroup(validPositions.map((p) => L.marker([p.lat, p.lng])))
+            map.fitBounds(group.getBounds().pad(0.1))
+          }
         }
+
+        setLeafletMap(map)
+        mapInitialized.current = true
       } catch (error) {
         console.error("Failed to load map:", error)
         setMapError(true)
@@ -83,9 +91,10 @@ export default function Map({ positions = [], center, zoom = 13, height = "300px
     return () => {
       if (map) {
         map.remove()
+        mapInitialized.current = false
       }
     }
-  }, [center, zoom, positions, leafletMap])
+  }, [center, zoom, positions])
 
   // If map failed to load or no positions, show fallback
   if (mapError || positions.length === 0) {

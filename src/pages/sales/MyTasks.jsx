@@ -9,17 +9,35 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Select } from "@/components/ui/select"
+import GPSCapture from "@/components/common/GPSCapture"
 import { formatDate, formatTime, isToday, getStatusVariant, getStatusLabel } from "@/utils/format"
-import { Calendar, Search, MapPin, Play, Eye } from "lucide-react"
+import {
+  Calendar,
+  Search,
+  MapPin,
+  Play,
+  Eye,
+  Clock,
+  CheckCircle,
+  AlertCircle,
+  Navigation,
+  Phone,
+  Mail,
+  Building2,
+} from "lucide-react"
 import dayjs from "dayjs"
 
 export default function MyTasks() {
   const navigate = useNavigate()
   const { user } = useAuthStore()
-  const { tasks, companies, visitReports } = useDataStore()
+  const { tasks, companies, visitReports, updateTask, addVisitReport } = useDataStore()
   const [activeTab, setActiveTab] = useState("today")
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
+  const [showCheckInModal, setShowCheckInModal] = useState(false)
+  const [selectedTask, setSelectedTask] = useState(null)
+  const [gpsLocation, setGpsLocation] = useState(null)
+  const [isCheckingIn, setIsCheckingIn] = useState(false)
 
   // Get user's tasks with company details
   const userTasksWithDetails = useMemo(() => {
@@ -44,6 +62,9 @@ export default function MyTasks() {
         break
       case "upcoming":
         filtered = filtered.filter((task) => dayjs(task.dueAt).isAfter(dayjs(), "day"))
+        break
+      case "overdue":
+        filtered = filtered.filter((task) => dayjs(task.dueAt).isBefore(dayjs(), "day") && task.status !== "completed")
         break
       case "completed":
         filtered = filtered.filter((task) => task.status === "completed")
@@ -71,49 +92,119 @@ export default function MyTasks() {
   }, [userTasksWithDetails, activeTab, searchTerm, statusFilter])
 
   const tabs = [
-    { id: "today", label: "Today", count: userTasksWithDetails.filter((task) => isToday(task.dueAt)).length },
+    {
+      id: "today",
+      label: "Today",
+      count: userTasksWithDetails.filter((task) => isToday(task.dueAt)).length,
+      icon: Calendar,
+    },
     {
       id: "upcoming",
       label: "Upcoming",
       count: userTasksWithDetails.filter((task) => dayjs(task.dueAt).isAfter(dayjs(), "day")).length,
+      icon: Clock,
+    },
+    {
+      id: "overdue",
+      label: "Overdue",
+      count: userTasksWithDetails.filter(
+        (task) => dayjs(task.dueAt).isBefore(dayjs(), "day") && task.status !== "completed",
+      ).length,
+      icon: AlertCircle,
     },
     {
       id: "completed",
       label: "Completed",
       count: userTasksWithDetails.filter((task) => task.status === "completed").length,
+      icon: CheckCircle,
     },
   ]
 
+  const handleCheckIn = async (task) => {
+    setSelectedTask(task)
+    setShowCheckInModal(true)
+  }
+
+  const confirmCheckIn = async () => {
+    if (!gpsLocation || !selectedTask) return
+
+    setIsCheckingIn(true)
+    try {
+      // Create check-in report
+      const checkInData = {
+        taskId: selectedTask.id,
+        salespersonId: user.id,
+        companyId: selectedTask.companyId,
+        checkIn: {
+          at: new Date().toISOString(),
+          gps: gpsLocation,
+        },
+      }
+
+      addVisitReport(checkInData)
+      updateTask(selectedTask.id, { status: "in_progress" })
+
+      setShowCheckInModal(false)
+      setSelectedTask(null)
+      setGpsLocation(null)
+    } catch (error) {
+      console.error("Error checking in:", error)
+      alert("Error checking in. Please try again.")
+    } finally {
+      setIsCheckingIn(false)
+    }
+  }
+
+  const getDirections = (task) => {
+    if (task.company?.address) {
+      const address = `${task.company.address.line1}, ${task.company.address.city}, ${task.company.address.state} ${task.company.address.pincode}`
+      const encodedAddress = encodeURIComponent(address)
+      window.open(`https://maps.google.com/maps?daddr=${encodedAddress}`, "_blank")
+    }
+  }
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-foreground">My Tasks</h1>
-        <p className="text-muted-foreground">Manage your assigned visits and track your progress</p>
+      <div className="space-y-2">
+        <h1 className="text-4xl font-bold tracking-tight">My Tasks</h1>
+        <p className="text-xl text-muted-foreground">Manage your assigned visits and track your progress</p>
       </div>
 
       {/* Tabs */}
-      <div className="flex space-x-1 bg-muted p-1 rounded-lg w-fit">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-              activeTab === tab.id
-                ? "bg-background text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            {tab.label}
-            {tab.count > 0 && (
-              <span className="ml-2 px-2 py-0.5 text-xs bg-primary/20 text-primary rounded-full">{tab.count}</span>
-            )}
-          </button>
-        ))}
+      <div className="flex flex-wrap gap-2 bg-muted/30 p-2 rounded-xl w-fit">
+        {tabs.map((tab) => {
+          const Icon = tab.icon
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
+                activeTab === tab.id
+                  ? "bg-primary text-primary-foreground shadow-lg"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+              }`}
+            >
+              <Icon className="h-4 w-4" />
+              {tab.label}
+              {tab.count > 0 && (
+                <span
+                  className={`px-2 py-0.5 text-xs rounded-full ${
+                    activeTab === tab.id
+                      ? "bg-primary-foreground/20 text-primary-foreground"
+                      : "bg-primary/20 text-primary"
+                  }`}
+                >
+                  {tab.count}
+                </span>
+              )}
+            </button>
+          )
+        })}
       </div>
 
       {/* Filters */}
-      <Card>
+      <Card className="glass-effect">
         <CardContent className="pt-6">
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1">
@@ -141,10 +232,12 @@ export default function MyTasks() {
       </Card>
 
       {/* Tasks List */}
-      <Card>
+      <Card className="data-table">
         <CardHeader>
-          <CardTitle className="flex items-center">
-            <Calendar className="mr-2 h-5 w-5" />
+          <CardTitle className="flex items-center gap-2">
+            {tabs.find((tab) => tab.id === activeTab)?.icon && (
+              <div className="h-5 w-5">{tabs.find((tab) => tab.id === activeTab).icon}</div>
+            )}
             {tabs.find((tab) => tab.id === activeTab)?.label} Tasks
           </CardTitle>
           <CardDescription>
@@ -153,8 +246,8 @@ export default function MyTasks() {
         </CardHeader>
         <CardContent>
           {filteredTasks.length === 0 ? (
-            <div className="text-center py-12">
-              <Calendar className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
+            <div className="text-center py-16">
+              <Calendar className="h-16 w-16 mx-auto mb-4 text-muted-foreground/50" />
               <h3 className="text-lg font-medium text-muted-foreground mb-2">No tasks found</h3>
               <p className="text-sm text-muted-foreground">
                 {searchTerm || statusFilter !== "all"
@@ -165,91 +258,189 @@ export default function MyTasks() {
           ) : (
             <div className="space-y-4">
               {filteredTasks.map((task) => (
-                <div
-                  key={task.id}
-                  className="flex items-center justify-between p-4 border border-border rounded-lg hover:bg-accent/50 transition-colors"
-                >
-                  <div className="flex-1 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <div className="text-sm font-medium text-muted-foreground">
-                          {formatDate(task.dueAt)} at {formatTime(task.dueAt)}
+                <Card key={task.id} className="glass-effect hover:bg-card/90 transition-all duration-200">
+                  <CardContent className="p-6">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1 space-y-4">
+                        {/* Header */}
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="text-sm font-medium text-muted-foreground">
+                              {formatDate(task.dueAt)} at {formatTime(task.dueAt)}
+                            </div>
+                            <Badge variant={getStatusVariant(task.status)} className="font-medium">
+                              {getStatusLabel(task.status)}
+                            </Badge>
+                            {dayjs(task.dueAt).isBefore(dayjs(), "day") && task.status !== "completed" && (
+                              <Badge variant="destructive" className="font-medium">
+                                Overdue
+                              </Badge>
+                            )}
+                          </div>
+                          {task.report?.checkIn && (
+                            <div className="text-sm text-success font-medium">
+                              Checked in at {formatTime(task.report.checkIn.at)}
+                            </div>
+                          )}
                         </div>
-                        <Badge variant={getStatusVariant(task.status)}>{getStatusLabel(task.status)}</Badge>
-                      </div>
-                      {task.report?.checkIn && (
-                        <div className="text-sm text-muted-foreground">
-                          Checked in at {formatTime(task.report.checkIn.at)}
+
+                        {/* Company Info */}
+                        <div className="flex items-start gap-4">
+                          <Building2 className="h-5 w-5 text-muted-foreground mt-1" />
+                          <div className="space-y-1">
+                            <h3 className="font-semibold text-lg">{task.company?.name}</h3>
+                            <p className="text-muted-foreground">
+                              {task.company?.address.line1}, {task.company?.address.city}, {task.company?.address.state}{" "}
+                              {task.company?.address.pincode}
+                            </p>
+                          </div>
                         </div>
-                      )}
-                    </div>
 
-                    <div>
-                      <h3 className="font-medium text-foreground">{task.company?.name}</h3>
-                      <p className="text-sm text-muted-foreground">
-                        {task.company?.address.line1}, {task.company?.address.city}, {task.company?.address.state}
-                      </p>
-                    </div>
+                        {/* Contact Info */}
+                        {task.contactHint?.name && (
+                          <div className="flex items-start gap-4">
+                            <div className="h-5 w-5" /> {/* Spacer */}
+                            <div className="space-y-2">
+                              <div className="flex items-center gap-2">
+                                <span className="text-muted-foreground">Contact:</span>
+                                <span className="font-medium">
+                                  {task.contactHint.name}
+                                  {task.contactHint.role && ` (${task.contactHint.role})`}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-4">
+                                {task.contactHint.phone && (
+                                  <a
+                                    href={`tel:${task.contactHint.phone}`}
+                                    className="flex items-center gap-1 text-sm text-primary hover:underline"
+                                  >
+                                    <Phone className="h-3 w-3" />
+                                    {task.contactHint.phone}
+                                  </a>
+                                )}
+                                {task.contactHint.email && (
+                                  <a
+                                    href={`mailto:${task.contactHint.email}`}
+                                    className="flex items-center gap-1 text-sm text-primary hover:underline"
+                                  >
+                                    <Mail className="h-3 w-3" />
+                                    {task.contactHint.email}
+                                  </a>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        )}
 
-                    {task.contactHint?.name && (
-                      <div className="text-sm">
-                        <span className="text-muted-foreground">Contact: </span>
-                        <span className="font-medium">
-                          {task.contactHint.name}
-                          {task.contactHint.role && ` (${task.contactHint.role})`}
-                        </span>
-                        {task.contactHint.phone && (
-                          <span className="text-muted-foreground ml-2">{task.contactHint.phone}</span>
+                        {/* Through & Notes */}
+                        {(task.through || task.notes) && (
+                          <div className="flex items-start gap-4">
+                            <div className="h-5 w-5" /> {/* Spacer */}
+                            <div className="space-y-1">
+                              {task.through && (
+                                <div className="text-sm">
+                                  <span className="text-muted-foreground">Through:</span>
+                                  <span className="ml-2">{task.through}</span>
+                                </div>
+                              )}
+                              {task.notes && (
+                                <div className="text-sm">
+                                  <span className="text-muted-foreground">Notes:</span>
+                                  <span className="ml-2">{task.notes}</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
                         )}
                       </div>
-                    )}
 
-                    {task.notes && (
-                      <div className="text-sm">
-                        <span className="text-muted-foreground">Notes: </span>
-                        <span>{task.notes}</span>
+                      {/* Action Buttons */}
+                      <div className="flex flex-col gap-2 ml-6">
+                        {task.status === "assigned" && isToday(task.dueAt) && (
+                          <Button onClick={() => handleCheckIn(task)} className="w-36 bg-success hover:bg-success/90">
+                            <MapPin className="mr-2 h-4 w-4" />
+                            Check In
+                          </Button>
+                        )}
+
+                        {task.status === "in_progress" && (
+                          <Button
+                            onClick={() => navigate(`/sales/visit/${task.id}`)}
+                            className="w-36 bg-primary hover:bg-primary/90"
+                          >
+                            <Play className="mr-2 h-4 w-4" />
+                            Visit Form
+                          </Button>
+                        )}
+
+                        {task.status === "completed" && (
+                          <Button
+                            variant="outline"
+                            onClick={() => navigate(`/sales/visit/${task.id}`)}
+                            className="w-36"
+                          >
+                            <Eye className="mr-2 h-4 w-4" />
+                            View Report
+                          </Button>
+                        )}
+
+                        <Button variant="ghost" onClick={() => getDirections(task)} className="w-36">
+                          <Navigation className="mr-2 h-4 w-4" />
+                          Directions
+                        </Button>
                       </div>
-                    )}
-                  </div>
-
-                  <div className="flex flex-col space-y-2 ml-6">
-                    {task.status === "assigned" && isToday(task.dueAt) && (
-                      <Button size="sm" className="w-32">
-                        <MapPin className="mr-2 h-4 w-4" />
-                        Check In
-                      </Button>
-                    )}
-
-                    {task.status === "in_progress" && (
-                      <Button onClick={() => navigate(`/sales/visit/${task.id}`)} size="sm" className="w-32">
-                        <Play className="mr-2 h-4 w-4" />
-                        Visit Form
-                      </Button>
-                    )}
-
-                    {task.status === "completed" && (
-                      <Button
-                        variant="outline"
-                        onClick={() => navigate(`/sales/visit/${task.id}`)}
-                        size="sm"
-                        className="w-32"
-                      >
-                        <Eye className="mr-2 h-4 w-4" />
-                        View Report
-                      </Button>
-                    )}
-
-                    <Button variant="ghost" size="sm" className="w-32">
-                      <MapPin className="mr-2 h-4 w-4" />
-                      Directions
-                    </Button>
-                  </div>
-                </div>
+                    </div>
+                  </CardContent>
+                </Card>
               ))}
             </div>
           )}
         </CardContent>
       </Card>
+
+      {/* Check-in Modal */}
+      {showCheckInModal && selectedTask && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-md">
+            <CardHeader>
+              <CardTitle>Check In to Visit</CardTitle>
+              <CardDescription>Confirm your location to check in to {selectedTask.company?.name}</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <GPSCapture onLocationCapture={setGpsLocation} autoCapture={true} className="w-full" />
+
+              {gpsLocation && (
+                <div className="p-3 bg-success/10 border border-success/20 rounded-lg">
+                  <div className="flex items-center gap-2 text-success">
+                    <CheckCircle className="h-4 w-4" />
+                    <span className="text-sm font-medium">Location captured successfully</span>
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-1">
+                    Lat: {gpsLocation.lat.toFixed(6)}, Lng: {gpsLocation.lng.toFixed(6)}
+                  </div>
+                </div>
+              )}
+
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setShowCheckInModal(false)
+                    setSelectedTask(null)
+                    setGpsLocation(null)
+                  }}
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+                <Button onClick={confirmCheckIn} disabled={!gpsLocation || isCheckingIn} className="flex-1">
+                  {isCheckingIn ? "Checking In..." : "Confirm Check In"}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   )
 }

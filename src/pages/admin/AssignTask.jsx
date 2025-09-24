@@ -1,38 +1,31 @@
-"use client";
+"use client"
 
-import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { useDataStore } from "@/store/useDataStore";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select } from "@/components/ui/select";
-import { UserPlus, Building2, User, Edit } from "lucide-react";
-import dayjs from "dayjs";
+import { useState, useEffect } from "react"
+import { useNavigate, useSearchParams } from "react-router-dom"
+import { useDataStore } from "@/store/useDataStore"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Select } from "@/components/ui/select"
+import { UserPlus, Building2, User, Edit } from "lucide-react"
+import dayjs from "dayjs"
 
 export default function AssignTask() {
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const { users, companies, tasks, addTask, addCompany, updateTask } =
-    useDataStore();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showNewCompany, setShowNewCompany] = useState(false);
+  const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const { users, companies, tasks, addTask, addCompany, updateTask } = useDataStore()
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [showNewCompany, setShowNewCompany] = useState(false)
 
   // Check if we're editing an existing task
-  const editTaskId = searchParams.get("edit");
-  const preSelectedCompanyId = searchParams.get("companyId");
-  const preSelectedSalespersonId = searchParams.get("salespersonId");
-  const isEditing = !!editTaskId;
+  const editTaskId = searchParams.get("edit")
+  const preSelectedCompanyId = searchParams.get("companyId")
+  const preSelectedSalespersonId = searchParams.get("salespersonId")
+  const isEditing = !!editTaskId
 
   // Find the task being edited
-  const editingTask = isEditing ? tasks.find((t) => t.id === editTaskId) : null;
+  const editingTask = isEditing ? tasks.find((t) => t.id === editTaskId) : null
 
   // Form state
   const [formData, setFormData] = useState({
@@ -52,12 +45,12 @@ export default function AssignTask() {
     newCompanyCity: "",
     newCompanyState: "",
     newCompanyPincode: "",
-  });
+  })
 
   // Load existing task data if editing
   useEffect(() => {
     if (editingTask) {
-      const dueDate = dayjs(editingTask.dueAt);
+      const dueDate = dayjs(editingTask.dueAt)
       setFormData({
         salespersonId: editingTask.salespersonId,
         companyId: editingTask.companyId,
@@ -74,33 +67,30 @@ export default function AssignTask() {
         newCompanyCity: "",
         newCompanyState: "",
         newCompanyPincode: "",
-      });
+      })
     } else {
       // Pre-fill with URL parameters if provided
       if (preSelectedCompanyId) {
-        setFormData((prev) => ({ ...prev, companyId: preSelectedCompanyId }));
+        setFormData((prev) => ({ ...prev, companyId: preSelectedCompanyId }))
       }
       if (preSelectedSalespersonId) {
-        setFormData((prev) => ({
-          ...prev,
-          salespersonId: preSelectedSalespersonId,
-        }));
+        setFormData((prev) => ({ ...prev, salespersonId: preSelectedSalespersonId }))
       }
     }
-  }, [editingTask, preSelectedCompanyId, preSelectedSalespersonId]);
+  }, [editingTask, preSelectedCompanyId, preSelectedSalespersonId])
 
-  const salesUsers = users.filter((user) => user.role === "sales");
+  const salesUsers = users.filter((user) => user.role === "sales")
 
   const handleInputChange = (field, value) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-  };
+    setFormData((prev) => ({ ...prev, [field]: value }))
+  }
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
+    e.preventDefault()
+    setIsSubmitting(true)
 
     try {
-      let companyId = formData.companyId;
+      let companyId = formData.companyId
 
       // Create new company if needed
       if (showNewCompany) {
@@ -114,15 +104,13 @@ export default function AssignTask() {
           },
           contacts: [],
           notes: "",
-        };
-        addCompany(newCompany);
-        companyId = Date.now().toString(); // This would be the ID assigned by addCompany
+        }
+        addCompany(newCompany)
+        companyId = Date.now().toString() // This would be the ID assigned by addCompany
       }
 
       // Create task
-      const dueAt = dayjs(
-        `${formData.dueDate} ${formData.dueTime}`
-      ).toISOString();
+      const dueAt = dayjs(`${formData.dueDate} ${formData.dueTime}`).toISOString()
 
       const taskData = {
         companyId,
@@ -137,39 +125,35 @@ export default function AssignTask() {
         },
         through: formData.through || undefined,
         notes: formData.notes || undefined,
-      };
+      }
 
       if (isEditing) {
         // Update existing task
-        updateTask(editTaskId, taskData);
-        alert("Task updated successfully!");
+        updateTask(editTaskId, taskData)
+        alert("Task updated successfully!")
       } else {
         // Create new task
-        addTask(taskData);
-        alert("Task assigned successfully!");
+        addTask(taskData)
+        alert("Task assigned successfully!")
       }
 
       // Navigate back to dashboard
-      navigate("/admin");
+      navigate("/admin")
     } catch (error) {
-      console.error("Error saving task:", error);
-      alert("Error saving task. Please try again.");
+      console.error("Error saving task:", error)
+      alert("Error saving task. Please try again.")
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-foreground">
-          {isEditing ? "Edit Task" : "Assign New Task"}
-        </h1>
+        <h1 className="text-3xl font-bold text-foreground">{isEditing ? "Edit Task" : "Assign New Task"}</h1>
         <p className="text-muted-foreground">
-          {isEditing
-            ? "Update the task details"
-            : "Create and assign a visit task to your sales team"}
+          {isEditing ? "Update the task details" : "Create and assign a visit task to your sales team"}
         </p>
       </div>
 
@@ -179,16 +163,10 @@ export default function AssignTask() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center">
-                {isEditing ? (
-                  <Edit className="mr-2 h-5 w-5" />
-                ) : (
-                  <UserPlus className="mr-2 h-5 w-5" />
-                )}
+                {isEditing ? <Edit className="mr-2 h-5 w-5" /> : <UserPlus className="mr-2 h-5 w-5" />}
                 Task Assignment
               </CardTitle>
-              <CardDescription>
-                Select salesperson and schedule the visit
-              </CardDescription>
+              <CardDescription>Select salesperson and schedule the visit</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
@@ -196,9 +174,7 @@ export default function AssignTask() {
                 <Select
                   id="salesperson"
                   value={formData.salespersonId}
-                  onChange={(e) =>
-                    handleInputChange("salespersonId", e.target.value)
-                  }
+                  onChange={(e) => handleInputChange("salespersonId", e.target.value)}
                   required
                 >
                   <option value="">Select a salesperson</option>
@@ -217,9 +193,7 @@ export default function AssignTask() {
                     id="dueDate"
                     type="date"
                     value={formData.dueDate}
-                    onChange={(e) =>
-                      handleInputChange("dueDate", e.target.value)
-                    }
+                    onChange={(e) => handleInputChange("dueDate", e.target.value)}
                     required
                   />
                 </div>
@@ -229,9 +203,7 @@ export default function AssignTask() {
                     id="dueTime"
                     type="time"
                     value={formData.dueTime}
-                    onChange={(e) =>
-                      handleInputChange("dueTime", e.target.value)
-                    }
+                    onChange={(e) => handleInputChange("dueTime", e.target.value)}
                     required
                   />
                 </div>
@@ -267,9 +239,7 @@ export default function AssignTask() {
                 <Building2 className="mr-2 h-5 w-5" />
                 Company Details
               </CardTitle>
-              <CardDescription>
-                Select existing company or add a new one
-              </CardDescription>
+              <CardDescription>Select existing company or add a new one</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center space-x-4">
@@ -295,9 +265,7 @@ export default function AssignTask() {
                   <Select
                     id="company"
                     value={formData.companyId}
-                    onChange={(e) =>
-                      handleInputChange("companyId", e.target.value)
-                    }
+                    onChange={(e) => handleInputChange("companyId", e.target.value)}
                     required={!showNewCompany}
                   >
                     <option value="">Select a company</option>
@@ -316,9 +284,7 @@ export default function AssignTask() {
                       id="newCompanyName"
                       placeholder="Enter company name"
                       value={formData.newCompanyName}
-                      onChange={(e) =>
-                        handleInputChange("newCompanyName", e.target.value)
-                      }
+                      onChange={(e) => handleInputChange("newCompanyName", e.target.value)}
                       required={showNewCompany}
                     />
                   </div>
@@ -328,9 +294,7 @@ export default function AssignTask() {
                       id="newCompanyAddress"
                       placeholder="Street address"
                       value={formData.newCompanyAddress}
-                      onChange={(e) =>
-                        handleInputChange("newCompanyAddress", e.target.value)
-                      }
+                      onChange={(e) => handleInputChange("newCompanyAddress", e.target.value)}
                       required={showNewCompany}
                     />
                   </div>
@@ -341,9 +305,7 @@ export default function AssignTask() {
                         id="newCompanyCity"
                         placeholder="City"
                         value={formData.newCompanyCity}
-                        onChange={(e) =>
-                          handleInputChange("newCompanyCity", e.target.value)
-                        }
+                        onChange={(e) => handleInputChange("newCompanyCity", e.target.value)}
                         required={showNewCompany}
                       />
                     </div>
@@ -353,9 +315,7 @@ export default function AssignTask() {
                         id="newCompanyState"
                         placeholder="State"
                         value={formData.newCompanyState}
-                        onChange={(e) =>
-                          handleInputChange("newCompanyState", e.target.value)
-                        }
+                        onChange={(e) => handleInputChange("newCompanyState", e.target.value)}
                         required={showNewCompany}
                       />
                     </div>
@@ -366,9 +326,7 @@ export default function AssignTask() {
                       id="newCompanyPincode"
                       placeholder="Pincode"
                       value={formData.newCompanyPincode}
-                      onChange={(e) =>
-                        handleInputChange("newCompanyPincode", e.target.value)
-                      }
+                      onChange={(e) => handleInputChange("newCompanyPincode", e.target.value)}
                       required={showNewCompany}
                     />
                   </div>
@@ -395,9 +353,7 @@ export default function AssignTask() {
                   id="contactName"
                   placeholder="Full name"
                   value={formData.contactName}
-                  onChange={(e) =>
-                    handleInputChange("contactName", e.target.value)
-                  }
+                  onChange={(e) => handleInputChange("contactName", e.target.value)}
                 />
               </div>
               <div className="space-y-2">
@@ -406,9 +362,7 @@ export default function AssignTask() {
                   id="contactRole"
                   placeholder="e.g., CEO, Manager"
                   value={formData.contactRole}
-                  onChange={(e) =>
-                    handleInputChange("contactRole", e.target.value)
-                  }
+                  onChange={(e) => handleInputChange("contactRole", e.target.value)}
                 />
               </div>
               <div className="space-y-2">
@@ -417,9 +371,7 @@ export default function AssignTask() {
                   id="contactPhone"
                   placeholder="+91-XXXXXXXXXX"
                   value={formData.contactPhone}
-                  onChange={(e) =>
-                    handleInputChange("contactPhone", e.target.value)
-                  }
+                  onChange={(e) => handleInputChange("contactPhone", e.target.value)}
                 />
               </div>
               <div className="space-y-2">
@@ -429,9 +381,7 @@ export default function AssignTask() {
                   type="email"
                   placeholder="email@company.com"
                   value={formData.contactEmail}
-                  onChange={(e) =>
-                    handleInputChange("contactEmail", e.target.value)
-                  }
+                  onChange={(e) => handleInputChange("contactEmail", e.target.value)}
                 />
               </div>
             </div>
@@ -440,28 +390,14 @@ export default function AssignTask() {
 
         {/* Submit Button */}
         <div className="flex justify-end space-x-4">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => navigate("/admin")}
-          >
+          <Button type="button" variant="outline" onClick={() => navigate("/admin")}>
             Cancel
           </Button>
-          <Button
-            type="submit"
-            disabled={isSubmitting}
-            className="bg-primary hover:bg-primary/90"
-          >
-            {isSubmitting
-              ? isEditing
-                ? "Updating..."
-                : "Assigning..."
-              : isEditing
-              ? "Update Task"
-              : "Assign Task"}
+          <Button type="submit" disabled={isSubmitting} className="bg-primary hover:bg-primary/90">
+            {isSubmitting ? (isEditing ? "Updating..." : "Assigning...") : isEditing ? "Update Task" : "Assign Task"}
           </Button>
         </div>
       </form>
     </div>
-  );
+  )
 }

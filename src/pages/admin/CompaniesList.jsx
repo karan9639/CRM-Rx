@@ -1,61 +1,39 @@
-"use client";
+"use client"
 
-import { useState, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
-import { useDataStore } from "@/store/useDataStore";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { formatDate, formatRelativeTime } from "@/utils/format";
-import {
-  Building2,
-  Search,
-  MapPin,
-  Phone,
-  Mail,
-  Calendar,
-  Plus,
-  Eye,
-} from "lucide-react";
-import dayjs from "dayjs";
+import { useState, useMemo } from "react"
+import { useNavigate } from "react-router-dom"
+import { useDataStore } from "@/store/useDataStore"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Input } from "@/components/ui/input"
+import { formatDate, formatRelativeTime } from "@/utils/format"
+import { Building2, Search, MapPin, Phone, Mail, Calendar, Plus, Eye } from "lucide-react"
+import dayjs from "dayjs"
 
 export default function CompaniesList() {
-  const navigate = useNavigate();
-  const { companies, tasks, visitReports } = useDataStore();
-  const [searchTerm, setSearchTerm] = useState("");
+  const navigate = useNavigate()
+  const { companies, tasks, visitReports } = useDataStore()
+  const [searchTerm, setSearchTerm] = useState("")
 
   // Enhance companies with task and visit data
   const companiesWithData = useMemo(() => {
     return companies.map((company) => {
-      const companyTasks = tasks.filter(
-        (task) => task.companyId === company.id
-      );
-      const companyReports = visitReports.filter(
-        (report) => report.companyId === company.id
-      );
+      const companyTasks = tasks.filter((task) => task.companyId === company.id)
+      const companyReports = visitReports.filter((report) => report.companyId === company.id)
 
       // Find next scheduled visit
       const upcomingTasks = companyTasks
-        .filter(
-          (task) =>
-            task.status !== "completed" && dayjs(task.dueAt).isAfter(dayjs())
-        )
-        .sort((a, b) => dayjs(a.dueAt).diff(dayjs(b.dueAt)));
+        .filter((task) => task.status !== "completed" && dayjs(task.dueAt).isAfter(dayjs()))
+        .sort((a, b) => dayjs(a.dueAt).diff(dayjs(b.dueAt)))
 
       // Find last completed visit
       const completedReports = companyReports
         .filter((report) => report.submittedAt)
-        .sort((a, b) => dayjs(b.submittedAt).diff(dayjs(a.submittedAt)));
+        .sort((a, b) => dayjs(b.submittedAt).diff(dayjs(a.submittedAt)))
 
-      const lastVisit = completedReports[0];
-      const nextVisit = upcomingTasks[0];
+      const lastVisit = completedReports[0]
+      const nextVisit = upcomingTasks[0]
 
       return {
         ...company,
@@ -64,55 +42,55 @@ export default function CompaniesList() {
         lastVisit,
         nextVisit,
         lastVisitOutcome: lastVisit?.outcome,
-      };
-    });
-  }, [companies, tasks, visitReports]);
+      }
+    })
+  }, [companies, tasks, visitReports])
 
   // Filter companies
   const filteredCompanies = useMemo(() => {
-    if (!searchTerm) return companiesWithData;
+    if (!searchTerm) return companiesWithData
 
     return companiesWithData.filter(
       (company) =>
         company.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         company.address.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        company.address.state.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }, [companiesWithData, searchTerm]);
+        company.address.state.toLowerCase().includes(searchTerm.toLowerCase()),
+    )
+  }, [companiesWithData, searchTerm])
 
   const getOutcomeVariant = (outcome) => {
     switch (outcome) {
       case "closed_win":
-        return "success";
+        return "success"
       case "closed_lost":
-        return "destructive";
+        return "destructive"
       case "follow_up":
-        return "warning";
+        return "warning"
       case "rescheduled":
-        return "warning";
+        return "warning"
       default:
-        return "outline";
+        return "outline"
     }
-  };
+  }
 
   const getOutcomeLabel = (outcome) => {
     switch (outcome) {
       case "closed_win":
-        return "Won";
+        return "Won"
       case "closed_lost":
-        return "Lost";
+        return "Lost"
       case "follow_up":
-        return "Follow Up";
+        return "Follow Up"
       case "rescheduled":
-        return "Rescheduled";
+        return "Rescheduled"
       case "met":
-        return "Met";
+        return "Met"
       case "not_available":
-        return "Not Available";
+        return "Not Available"
       default:
-        return outcome;
+        return outcome
     }
-  };
+  }
 
   return (
     <div className="space-y-6">
@@ -120,14 +98,9 @@ export default function CompaniesList() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-foreground">Companies</h1>
-          <p className="text-muted-foreground">
-            Manage your client companies and view visit history
-          </p>
+          <p className="text-muted-foreground">Manage your client companies and view visit history</p>
         </div>
-        <Button
-          onClick={() => navigate("/admin/assign-task")}
-          className="bg-primary hover:bg-primary/90"
-        >
+        <Button onClick={() => navigate("/admin/assign-task")} className="bg-primary hover:bg-primary/90">
           <Plus className="mr-2 h-4 w-4" />
           Add Company
         </Button>
@@ -153,21 +126,14 @@ export default function CompaniesList() {
         {filteredCompanies.length === 0 ? (
           <div className="col-span-full text-center py-12">
             <Building2 className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
-            <h3 className="text-lg font-medium text-muted-foreground mb-2">
-              No companies found
-            </h3>
+            <h3 className="text-lg font-medium text-muted-foreground mb-2">No companies found</h3>
             <p className="text-sm text-muted-foreground">
-              {searchTerm
-                ? "Try adjusting your search terms."
-                : "Start by adding your first company."}
+              {searchTerm ? "Try adjusting your search terms." : "Start by adding your first company."}
             </p>
           </div>
         ) : (
           filteredCompanies.map((company) => (
-            <Card
-              key={company.id}
-              className="hover:bg-accent/50 transition-colors"
-            >
+            <Card key={company.id} className="hover:bg-accent/50 transition-colors">
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
@@ -177,11 +143,7 @@ export default function CompaniesList() {
                       {company.address.city}, {company.address.state}
                     </CardDescription>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => navigate(`/admin/companies/${company.id}`)}
-                  >
+                  <Button variant="ghost" size="sm" onClick={() => navigate(`/admin/companies/${company.id}`)}>
                     <Eye className="h-4 w-4" />
                   </Button>
                 </div>
@@ -191,8 +153,7 @@ export default function CompaniesList() {
                 <div className="text-sm text-muted-foreground">
                   <div>{company.address.line1}</div>
                   <div>
-                    {company.address.city}, {company.address.state}{" "}
-                    {company.address.pincode}
+                    {company.address.city}, {company.address.state} {company.address.pincode}
                   </div>
                 </div>
 
@@ -202,14 +163,8 @@ export default function CompaniesList() {
                     <div className="text-sm font-medium">Primary Contact:</div>
                     <div className="text-sm text-muted-foreground">
                       <div className="flex items-center">
-                        <span className="font-medium">
-                          {company.contacts[0].name}
-                        </span>
-                        {company.contacts[0].role && (
-                          <span className="ml-2">
-                            ({company.contacts[0].role})
-                          </span>
-                        )}
+                        <span className="font-medium">{company.contacts[0].name}</span>
+                        {company.contacts[0].role && <span className="ml-2">({company.contacts[0].role})</span>}
                       </div>
                       {company.contacts[0].phone && (
                         <div className="flex items-center mt-1">
@@ -248,10 +203,7 @@ export default function CompaniesList() {
                         {formatRelativeTime(company.lastVisit.submittedAt)}
                       </div>
                       {company.lastVisitOutcome && (
-                        <Badge
-                          variant={getOutcomeVariant(company.lastVisitOutcome)}
-                          className="text-xs"
-                        >
+                        <Badge variant={getOutcomeVariant(company.lastVisitOutcome)} className="text-xs">
                           {getOutcomeLabel(company.lastVisitOutcome)}
                         </Badge>
                       )}
@@ -284,9 +236,7 @@ export default function CompaniesList() {
                     variant="outline"
                     size="sm"
                     className="flex-1 bg-transparent hover:bg-primary/10 hover:text-primary hover:border-primary transition-all duration-200"
-                    onClick={() =>
-                      navigate(`/admin/assign-task?companyId=${company.id}`)
-                    }
+                    onClick={() => navigate(`/admin/assign-task?companyId=${company.id}`)}
                   >
                     Assign Task
                   </Button>
@@ -305,5 +255,5 @@ export default function CompaniesList() {
         )}
       </div>
     </div>
-  );
+  )
 }
